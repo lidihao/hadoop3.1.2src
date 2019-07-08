@@ -2662,6 +2662,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   /**
+   * 申请一个新的Block,最终会调用BlockManager分配Block
    * The client would like to obtain an additional block for the indicated
    * filename (which is being written-to).  Return an array that consists
    * of the block, plus a set of machines.  The first on this list should

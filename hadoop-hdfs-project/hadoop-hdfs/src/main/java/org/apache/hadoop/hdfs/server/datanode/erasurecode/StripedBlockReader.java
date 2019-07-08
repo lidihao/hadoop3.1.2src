@@ -45,6 +45,7 @@ import java.util.EnumSet;
 import java.util.concurrent.Callable;
 
 /**
+ * 通过BlockReader来读取数据
  * StripedBlockReader is used to read block data from one source DN, it contains
  * a block reader, read buffer and striped block index.
  * Only allocate StripedBlockReader once for one source, and the StripedReader

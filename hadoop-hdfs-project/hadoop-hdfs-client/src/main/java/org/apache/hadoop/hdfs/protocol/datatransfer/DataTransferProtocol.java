@@ -35,7 +35,7 @@ import org.apache.hadoop.util.DataChecksum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
+/**dataTransfer有两个子类，Sender,Receiver,Sender用于发起流式接口请求，Receiver用于接受请求
  * Transfer data to/from datanode using a streaming protocol.
  */
 @InterfaceAudience.Private

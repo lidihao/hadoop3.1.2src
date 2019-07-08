@@ -35,7 +35,8 @@ import com.google.common.annotations.VisibleForTesting;
 
 import org.slf4j.Logger;
 
-/**
+/**每当有Client通过Sender类发起流式接口请求，Server都会创建一个DataXceiver对象
+ * 用于响应这个请求并执行相应的操作
  * Server used for receiving/sending a block of data.
  * This is created to listen for requests from clients or 
  * other DataNodes.  This small server does not use the 
@@ -136,7 +137,9 @@ class DataXceiverServer implements Runnable {
         conf.getInt(DFSConfigKeys.DFS_DATANODE_BALANCE_MAX_NUM_CONCURRENT_MOVES_KEY,
             DFSConfigKeys.DFS_DATANODE_BALANCE_MAX_NUM_CONCURRENT_MOVES_DEFAULT));
   }
-
+  //循环调用peerServer的accept()方法监听，如果有新的连接请求则创建Peer对象，并构造一个DataXceiver
+  //线程服务这个流式请求，也就是说DataXceiverServer只负责连接的建立以及构造并启动DataRceiver，流式
+  //接口请求则是由DataXceiver响应，真正的操作则是由DataXceiver进行。
   @Override
   public void run() {
     Peer peer = null;

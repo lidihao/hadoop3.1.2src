@@ -75,6 +75,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
+ * 这个类支持以Striped layout写入文件
  * This class supports writing files in striped layout and erasure coded format.
  * Each stripe contains a sequence of cells.
  */

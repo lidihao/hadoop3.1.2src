@@ -51,10 +51,11 @@ class StripedBlockReconstructor extends StripedReconstructor
   @Override
   public void run() {
     try {
+      //初始化Decoder,根据相关的EC策略获取ECDecoder
       initDecoderIfNecessary();
-
+      // 初始化StripedReader
       getStripedReader().init();// IOException
-
+      // 初始化StripedWriter
       stripedWriter.init();// IOException
 
       reconstruct();
@@ -90,14 +91,17 @@ class StripedBlockReconstructor extends StripedReconstructor
       long start = Time.monotonicNow();
       // step1: read from minimum source DNs required for reconstruction.
       // The returned success list is the source DNs we do real read from
+      //读取数据
       getStripedReader().readMinimumSources(toReconstructLen);
       long readEnd = Time.monotonicNow();
 
       // step2: decode to reconstruct targets
+      //解码
       reconstructTargets(toReconstructLen);
       long decodeEnd = Time.monotonicNow();
 
       // step3: transfer data
+      //传送数据
       if (stripedWriter.transferData2Targets() == 0) {
         String error = "Transfer failed for all targets.";
         throw new IOException(error);

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
+ * 由java的解码器
  * A raw erasure decoder in RS code scheme in pure Java in case native one
  * isn't available in some environment. Please always use native implementations
  * when possible.

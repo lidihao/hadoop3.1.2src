@@ -64,7 +64,8 @@ import static org.apache.hadoop.io.nativeio.NativeIO.POSIX.SYNC_FILE_RANGE_WRITE
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 
-/** A class that receives a block and writes to its own disk, meanwhile
+/**接收一个block然后将它写入磁盘，同时将它复制到另一个网址
+ * A class that receives a block and writes to its own disk, meanwhile
  * may copies it to another site. If a throttler is provided,
  * streaming throttling is also supported.
  **/

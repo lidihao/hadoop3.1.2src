@@ -229,6 +229,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**********************************************************
+ * 通过DataStorage以及FsDatasetImpl管理这数据节点存储上的所有数据块
+ * DataNode类还会通过流式接口对客户端和其他数据节点提供读数据块，写数据块
+ * ，复制数据块等功能。同时DataNode类实现了InterDatanodeProtocol以及
+ * ClientDatanodeProtocol,使得数据节点可以接收来自其他数据节点以及客户端的
+ * 远程以及ClientDatanodeProtocol,使得数据节点可以接收来自其他数据节点以及
+ * 客户端的远程RPC请求。DataNode类还会通过BlockPoolManager对象周期性地向
+ * NameNode发送心跳，块汇报，增量块汇报以及缓存汇报，同时执行Namenode发回名字节点
+ * 指令。DataNode持有DataBlockScanner对象周期性地检查存储上的所有数据块，以及DirectoryScanner
+ * 对象验证存储上数据块和内存中数据块的一致性.
  * DataNode is a class (and program) that stores a set of
  * blocks for a DFS deployment.  A single deployment can
  * have one or many DataNodes.  Each DataNode communicates
@@ -1127,7 +1136,13 @@ public class DataNode extends ReconfigurableBase
       this.diskBalancer = null;
     }
   }
+  //创建一个DataXceiverServer对象监听所有流式接口请求，
+  //首先创建TcpPeerServer对象(对ServerSocket的封装),它能通过accept()方法返回Peer对象(封装了
+  // Socket对象，提供通信的输入/输出流).TcpServer的监听地址是通过dfs.datanode.address配置项来
+  //配置.
 
+
+  //短路操作？？？读取本地数据？？？
   private void initDataXceiver() throws IOException {
     // find free port or use privileged port provided
     TcpPeerServer tcpPeerServer;

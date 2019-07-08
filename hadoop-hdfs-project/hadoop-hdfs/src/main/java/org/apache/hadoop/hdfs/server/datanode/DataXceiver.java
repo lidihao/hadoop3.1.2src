@@ -103,7 +103,7 @@ import static org.apache.hadoop.util.Time.monotonicNow;
 class DataXceiver extends Receiver implements Runnable {
   public static final Logger LOG = DataNode.LOG;
   static final Log ClientTraceLog = DataNode.ClientTraceLog;
-  
+  // 代表一个连接
   private Peer peer;
   private final String remoteAddress; // address of remote side
   private final String remoteAddressWithoutPort; // only the address, no port
@@ -266,6 +266,7 @@ class DataXceiver extends Receiver implements Runnable {
           } else {
             peer.setReadTimeout(dnConf.socketTimeout);
           }
+          // 调用Receiver.readOp()从输入流中解析操作符
           op = readOp();
         } catch (InterruptedIOException ignored) {
           // Time out while we wait for client rpc
@@ -287,6 +288,7 @@ class DataXceiver extends Receiver implements Runnable {
         }
 
         opStartTime = monotonicNow();
+        // 处理操作符
         processOp(op);
         ++opsProcessed;
       } while ((peer != null) &&
@@ -653,6 +655,11 @@ class DataXceiver extends Receiver implements Runnable {
     datanode.metrics.addReadBlockOp(elapsed());
     datanode.metrics.incrReadsFromClient(peer.isLocal(), read);
   }
+  // 向数据节点写入数据
+  //HDFS使用数据流管道方式来写数据，DFSClient通过调用Sender.writeBlock()方法触发一个写数据块请求
+  //这个请求会传送到数据流管道的每一个数据节点，数据流管道中的最后一个数据节点会回复请求确认
+
+
 
   @Override
   public void writeBlock(final ExtendedBlock block,
@@ -676,13 +683,17 @@ class DataXceiver extends Receiver implements Runnable {
       final String[] targetStorageIds) throws IOException {
     previousOpClientName = clientname;
     updateCurrentThreadName("Receiving block " + block);
+    // 指示当前写操作是否是DFSClient发起的
     final boolean isDatanode = clientname.length() == 0;
     final boolean isClient = !isDatanode;
+    //指示当前的写操作是否为数据块复制操作，利用数据流管道状态来判断
     final boolean isTransfer = stage == BlockConstructionStage.TRANSFER_RBW
         || stage == BlockConstructionStage.TRANSFER_FINALIZED;
     allowLazyPersist = allowLazyPersist &&
         (dnConf.getAllowNonLocalLazyPersist() || peer.isLocal());
     long size = 0;
+    // 上游的replyOutputStream或者是Client
+    // DataNode与数据通道中上游节点通信用到了
     // reply to upstream datanode or client 
     final DataOutputStream replyOut = getBufferedOutputStream();
 
@@ -886,6 +897,7 @@ class DataXceiver extends Receiver implements Runnable {
       }
 
       // receive the block and mirror to the next target
+      // 从上游接收数据包发送给下游，从下游接收确认响应发送给上游
       if (blockReceiver != null) {
         String mirrorAddr = (mirrorSock == null) ? null : mirrorNode;
         blockReceiver.receiveBlock(mirrorOut, mirrorIn, replyOut,

@@ -77,6 +77,9 @@ import com.google.common.base.Preconditions;
 
 
 /****************************************************************
+ * DFSOutputStrem中使用Packet类来封装一个数据包，每个数据包中都包含若干个
+ * 检验块，以及校验块对应的校验和。一个完整的数据包包含了数据包包头，记录了数据包的
+ * 概要属性信息，然后是校验和数据，最后是校验块数据.
  * DFSOutputStream creates files from a stream of bytes.
  *
  * The client application writes data that is cached internally by
@@ -88,7 +91,16 @@ import com.google.common.base.Preconditions;
  * enqueued into the dataQueue of DataStreamer. DataStreamer is a
  * thread that picks up packets from the dataQueue and sends it to
  * the first datanode in the pipeline.
- *
+ *实现概要:
+ * 当client写入的数据达到一个数据包的长度时，DFSOutputStream会构造一个Packet对象
+ * 保存这个要发送的数据包，如果当前数据块中的所有数据包已经发送完毕，DFSOutputStream会
+ * 发送一个空的数据包标识数据块发送完毕，新构造的Packet对象会被放到DataStreamer.dataQueue中
+ * 由DataSteamer线程处理.
+ * DataStreamer线程会从dataQueue中取出Packet对象，然后通过底层IO流将这个Packet发送到数据
+ * 流管道中的第一个DataNode上。发送完毕后，将Packet从dataQueue中移除，放入ackQueue中等待下游节点
+ * 的确认消息。确认消息有dataStreamer的内部线程类ResponseProcessor处理
+ * ResponseProcesser线程等待下游节点的相应ack，判断ack状态码，如果是失败状态，则记录出错。如果ack状态
+ * 是成功，则将数据包从ack队列中移除，整个数据包发送过程完成。
  ****************************************************************/
 @InterfaceAudience.Private
 public class DFSOutputStream extends FSOutputSummer
@@ -1067,7 +1079,7 @@ public class DFSOutputStream extends FSOutputSummer
   public String toString() {
     return getClass().getSimpleName() + ":" + streamer;
   }
-
+  // 向NameNode申请一个Block
   static LocatedBlock addBlock(DatanodeInfo[] excludedNodes,
       DFSClient dfsClient, String src, ExtendedBlock prevBlock, long fileId,
       String[] favoredNodes, EnumSet<AddBlockFlag> allocFlags)
@@ -1078,6 +1090,7 @@ public class DFSOutputStream extends FSOutputSummer
     long localstart = Time.monotonicNow();
     while (true) {
       try {
+        //调用ClientProtocol.addBlock()方法向NameNode申请一个新的数据块,并提交上一个数据块
         return dfsClient.namenode.addBlock(src, dfsClient.clientName, prevBlock,
             excludedNodes, fileId, favoredNodes, allocFlags);
       } catch (RemoteException e) {

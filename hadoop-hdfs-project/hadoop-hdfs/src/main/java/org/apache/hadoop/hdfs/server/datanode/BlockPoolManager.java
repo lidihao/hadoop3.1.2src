@@ -37,6 +37,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 
 /**
+ * BlockPoolManager类负责管理所有的BPOfferService实例
  * Manages the BPOfferService objects for the data node.
  * Creation, removal, starting, stopping, shutdown on BPOfferService
  * objects must be done via APIs in this class.

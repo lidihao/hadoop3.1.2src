@@ -75,6 +75,8 @@ import org.apache.hadoop.util.Timer;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
+ * 负责管理指定存储目录下一个指定块池的所有数据块\
+ * 一个块池目录存在current,finalized,rbw,lazyPersisit,tmp
  * A block pool slice represents a portion of a block pool stored on a volume.
  * Taken together, all BlockPoolSlices sharing a block pool ID across a
  * cluster represent a single block pool.

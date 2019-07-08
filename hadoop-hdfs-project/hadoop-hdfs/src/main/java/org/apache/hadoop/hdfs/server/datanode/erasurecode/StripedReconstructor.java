@@ -43,6 +43,7 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * 重构EC
  * StripedReconstructor reconstruct one or more missed striped block in the
  * striped block group, the minimum number of live striped blocks should be
  * no less than data block number.
@@ -101,10 +102,11 @@ abstract class StripedReconstructor {
 
   private final Configuration conf;
   private final DataNode datanode;
+  //EC策略
   private final ErasureCodingPolicy ecPolicy;
   private RawErasureDecoder decoder;
   private final ExtendedBlock blockGroup;
-  private static final ByteBufferPool BUFFER_POOL = new ElasticByteBufferPool();
+  private static final ByteBufferPool BUFFER_POOL = new ElasticByteBufferPool();//缓冲池，获取ByteBuffer
 
   // position in striped internal block
   private long positionInBlock;

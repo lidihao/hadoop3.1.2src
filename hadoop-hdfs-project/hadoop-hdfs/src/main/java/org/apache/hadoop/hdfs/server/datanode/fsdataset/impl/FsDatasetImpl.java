@@ -123,6 +123,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**************************************************
+ * 管理所有块
  * FSDataset manages a set of data blocks.  Each block
  * has a unique name and an extent on disk.
  *

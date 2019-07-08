@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 处理重构EC的命令
  * ErasureCodingWorker handles the erasure coding reconstruction work commands.
  * These commands would be issued from Namenode as part of Datanode's heart beat
  * response. BPOfferService delegates the work to this class for handling EC
@@ -50,8 +51,9 @@ public final class ErasureCodingWorker {
   private final DataNode datanode;
   private final Configuration conf;
   private final float xmitWeight;
-
+  // 运行重构Striped block任务线程池
   private ThreadPoolExecutor stripedReconstructionPool;
+  // 运行读取Striped block的线程池
   private ThreadPoolExecutor stripedReadPool;
 
   public ErasureCodingWorker(Configuration conf, DataNode datanode) {
@@ -124,6 +126,7 @@ public final class ErasureCodingWorker {
     for (BlockECReconstructionInfo reconInfo : ecTasks) {
       int xmitsSubmitted = 0;
       try {
+        // 存储用于EC重构的信息
         StripedReconstructionInfo stripedReconInfo =
             new StripedReconstructionInfo(
             reconInfo.getExtendedBlock(), reconInfo.getErasureCodingPolicy(),

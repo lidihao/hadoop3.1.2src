@@ -22,6 +22,7 @@ import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 
 /**
+ * 将block pool id与Block绑定
  * Identifies a Block uniquely across the block pools
  */
 @InterfaceAudience.Private

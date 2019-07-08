@@ -85,7 +85,7 @@ public abstract class RawErasureDecoder {
                      ByteBuffer[] outputs) throws IOException {
     ByteBufferDecodingState decodingState = new ByteBufferDecodingState(this,
         inputs, erasedIndexes, outputs);
-
+    //是否使用直接内存
     boolean usingDirectBuffer = decodingState.usingDirectBuffer;
     int dataLen = decodingState.decodeLength;
     if (dataLen == 0) {

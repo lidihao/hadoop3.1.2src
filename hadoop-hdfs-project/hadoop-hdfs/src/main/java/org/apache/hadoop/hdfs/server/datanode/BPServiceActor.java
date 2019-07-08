@@ -73,6 +73,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 
 /**
+ * 与NameNode进行第一次握手
+ * 向namenode注册
+ * 定期向namenode发送心跳，增量块汇报，全量块汇报以及缓存块汇报
+ * 执行NameNode传回的命令
  * A thread per active or standby namenode to perform:
  * <ul>
  * <li> Pre-registration handshake with namenode</li>
@@ -85,7 +89,15 @@ import com.google.common.base.Joiner;
 class BPServiceActor implements Runnable {
   
   static final Logger LOG = DataNode.LOG;
+  // 当期BPServiceActor对应的NameNode地址
   final InetSocketAddress nnAddr;
+  //当前BPServiceActor对应NameNode的状态
+  /**
+   *  INITIALIZING("initializing"),
+   *     ACTIVE("active"),
+   *     STANDBY("standby"),
+   *     STOPPING("stopping");
+   */
   HAServiceState state;
 
   final BPOfferService bpos;
@@ -94,6 +106,7 @@ class BPServiceActor implements Runnable {
   private final Scheduler scheduler;
 
   Thread bpThread;
+  //向NameNode发起RPC请求的client
   DatanodeProtocolClientSideTranslatorPB bpNamenode;
 
   enum RunningState {
@@ -631,6 +644,7 @@ class BPServiceActor implements Runnable {
         //
         final boolean sendHeartbeat = scheduler.isHeartbeatDue(startTime);
         HeartbeatResponse resp = null;
+        // 定期发送心跳，处理HeartbeatResponse中的命令
         if (sendHeartbeat) {
           //
           // All heartbeat messages include following info:
@@ -642,6 +656,7 @@ class BPServiceActor implements Runnable {
           boolean requestBlockReportLease = (fullBlockReportLeaseId == 0) &&
                   scheduler.isBlockReportDue(startTime);
           if (!dn.areHeartbeatsDisabledForTests()) {
+            //发送心跳
             resp = sendHeartBeat(requestBlockReportLease);
             assert resp != null;
             if (resp.getFullBlockReportLeaseId() != 0) {
@@ -672,6 +687,7 @@ class BPServiceActor implements Runnable {
             }
 
             long startProcessCommands = monotonicNow();
+            //处理HeartbeatResponse中的命令
             if (!processCommand(resp.getCommands()))
               continue;
             long endProcessCommands = monotonicNow();
@@ -682,6 +698,7 @@ class BPServiceActor implements Runnable {
             }
           }
         }
+        // 发送增量的块信息
         if (!dn.areIBRDisabledForTests() &&
             (ibrManager.sendImmediately()|| sendHeartbeat)) {
           ibrManager.sendIBRs(bpNamenode, bpRegistration,
@@ -695,12 +712,14 @@ class BPServiceActor implements Runnable {
           LOG.info("Forcing a full block report to " + nnAddr);
         }
         if ((fullBlockReportLeaseId != 0) || forceFullBr) {
+          // 数据块汇报
           cmds = blockReport(fullBlockReportLeaseId);
           fullBlockReportLeaseId = 0;
         }
         processCommand(cmds == null ? null : cmds.toArray(new DatanodeCommand[cmds.size()]));
 
         if (!dn.areCacheReportsDisabledForTests()) {
+          //缓存数据块的汇报
           DatanodeCommand cmd = cacheReport();
           processCommand(new DatanodeCommand[]{ cmd });
         }
@@ -813,6 +832,7 @@ class BPServiceActor implements Runnable {
       while (true) {
         // init stuff
         try {
+          //与NameNode握手并初始化DataNode上该命名空间对应(BlockPool)的存储
           // setup storage
           connectToNNAndHandshake();
           break;

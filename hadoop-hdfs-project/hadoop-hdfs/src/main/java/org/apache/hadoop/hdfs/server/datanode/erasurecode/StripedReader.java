@@ -251,6 +251,7 @@ class StripedReader {
   }
 
   /**
+   * 首先先尝试最好的DataNode,如果节点太慢或损坏，再更新success list
    * Read from minimum source DNs required for reconstruction in the iteration.
    * First try the success list which we think they are the best DNs
    * If source DN is corrupt or slow, try to read some other source DN,
@@ -286,10 +287,12 @@ class StripedReader {
      * source DNs which we think best.
      */
     for (int i = 0; i < minRequiredSources; i++) {
+      // 获取第i个block的StripedBlockReader
       StripedBlockReader reader = readers.get(successList[i]);
       int toRead = getReadLength(liveIndices[successList[i]],
           reconstructLength);
       if (toRead > 0) {
+        // Future任务，多线程同时读取
         Callable<BlockReadStats> readCallable =
             reader.readFromBlock(toRead, corruptedBlocks);
         Future<BlockReadStats> f = readService.submit(readCallable);

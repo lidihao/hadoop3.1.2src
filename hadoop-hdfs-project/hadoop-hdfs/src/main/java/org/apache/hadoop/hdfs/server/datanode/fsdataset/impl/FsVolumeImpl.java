@@ -93,6 +93,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
+ * 每一个存储目录下的数据块管理功能有一个单独的FsVolumeImpl对象负责
  * The underlying volume used to store replica.
  * 
  * It uses the {@link FsDatasetImpl} object for synchronization.

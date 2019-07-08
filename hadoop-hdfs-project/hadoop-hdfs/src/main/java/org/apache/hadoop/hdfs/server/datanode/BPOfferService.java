@@ -47,6 +47,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
+ * 每一个block-pool/namespace都有一个BPOfferService,处理active和standby NN之间的通信问题
  * One instance per block-pool/namespace on the DN, which handles the
  * heartbeats to the active and standby NNs for that namespace.
  * This class manages an instance of {@link BPServiceActor} for each NN,
