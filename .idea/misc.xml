@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/hadoop-common-project/hadoop-auth-examples" />
+  </component>
+  <component name="JavaScriptSettings">
+    <option name="languageLevel" value="ES6" />
+  </component>
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/hadoop-dist/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-tools/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-project/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-assemblies/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-build-tools/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-minicluster/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-hdfs-project/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-project-dist/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-common/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-common/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-router/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-resourcemanager/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-sharedcachemanager/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-timelineservice-hbase/hadoop-yarn-server-timelineservice-hbase-client/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-timeline-pluginstorage/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-timelineservice-hbase-tests/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-registry/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-maven-plugins/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-client-modules/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-common-project/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-mapreduce-project/pom.xml" />
+        <option value="$PROJECT_DIR$/hadoop-cloud-storage-project/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>

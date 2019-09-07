@@ -198,7 +198,7 @@ public class ClientRMService extends AbstractService implements
 
   private static final Log LOG = LogFactory.getLog(ClientRMService.class);
 
-  //记录有
+  //记录Application的个数
   final private AtomicInteger applicationCounter = new AtomicInteger(0);
   final private YarnScheduler scheduler;
   final private RMContext rmContext;
