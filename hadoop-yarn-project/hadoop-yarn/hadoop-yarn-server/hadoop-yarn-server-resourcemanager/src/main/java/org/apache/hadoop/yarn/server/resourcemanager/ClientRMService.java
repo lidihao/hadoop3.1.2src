@@ -188,6 +188,7 @@ import org.apache.hadoop.yarn.util.timeline.TimelineUtils;
 
 
 /**
+ * 实现ApplicationClientProtocol，为Client提供服务
  * The client interface to the Resource Manager. This module handles all the rpc
  * interfaces to the resource manager from the client.
  */
@@ -197,6 +198,7 @@ public class ClientRMService extends AbstractService implements
 
   private static final Log LOG = LogFactory.getLog(ClientRMService.class);
 
+  //记录有
   final private AtomicInteger applicationCounter = new AtomicInteger(0);
   final private YarnScheduler scheduler;
   final private RMContext rmContext;
