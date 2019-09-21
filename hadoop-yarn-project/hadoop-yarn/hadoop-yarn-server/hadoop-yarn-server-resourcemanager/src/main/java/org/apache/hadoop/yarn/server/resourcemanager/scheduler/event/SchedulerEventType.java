@@ -36,6 +36,8 @@ public enum SchedulerEventType {
   APP_ATTEMPT_REMOVED,
 
   // Source: ContainerAllocationExpirer
+  //当资源调度器将一个Container分配给某个ApplicationMaster之后，如果该ApplicationMaster在一定的时间间隔没有
+  //使用该Container，则资源调度器会对其进行回收
   CONTAINER_EXPIRED,
 
   // Source: SchedulerAppAttempt::pullNewlyUpdatedContainer.

@@ -1698,9 +1698,11 @@ public class CapacityScheduler extends
       nodeUpdate(nodeUpdatedEvent.getRMNode());
     }
     break;
+      // 添加Application到调度器
     case APP_ADDED:
     {
       AppAddedSchedulerEvent appAddedEvent = (AppAddedSchedulerEvent) event;
+      // 解析出任务提交到的队列
       String queueName = resolveReservationQueueName(appAddedEvent.getQueue(),
           appAddedEvent.getApplicationId(), appAddedEvent.getReservationID(),
           appAddedEvent.getIsAppRecovering());
@@ -2149,6 +2151,7 @@ public class CapacityScheduler extends
       readLock.lock();
       CSQueue queue = getQueue(queueName);
       // Check if the queue is a plan queue
+      // 如果queue不存在或者Queue不是PlanQueue(可以预定资源的Queue)
       if ((queue == null) || !(queue instanceof PlanQueue)) {
         return queueName;
       }

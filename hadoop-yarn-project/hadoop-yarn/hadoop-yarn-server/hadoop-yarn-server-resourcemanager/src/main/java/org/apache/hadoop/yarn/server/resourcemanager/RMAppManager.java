@@ -314,7 +314,7 @@ public class RMAppManager implements EventHandler<RMAppManagerEvent>,
       ApplicationSubmissionContext submissionContext, long submitTime,
       String user) throws YarnException {
     ApplicationId applicationId = submissionContext.getApplicationId();
-
+    // 创建RMAppImpl
     // Passing start time as -1. It will be eventually set in RMAppImpl
     // constructor.
     RMAppImpl application = createAndPopulateNewRMApp(
@@ -331,6 +331,8 @@ public class RMAppManager implements EventHandler<RMAppManagerEvent>,
         // Dispatcher is not yet started at this time, so these START events
         // enqueued should be guaranteed to be first processed when dispatcher
         // gets started.
+        // 处理Application START事件
+        // 产生RMAppEventType.START事件,并由
         this.rmContext.getDispatcher().getEventHandler()
             .handle(new RMAppEvent(applicationId, RMAppEventType.START));
       }
@@ -442,6 +444,7 @@ public class RMAppManager implements EventHandler<RMAppManagerEvent>,
     // Concurrent app submissions with same applicationId will fail here
     // Concurrent app submissions with different applicationIds will not
     // influence each other
+    //放到ApplicationId,RMAppImp Map中
     if (rmContext.getRMApps().putIfAbsent(applicationId, application) !=
         null) {
       String message = "Application with id " + applicationId

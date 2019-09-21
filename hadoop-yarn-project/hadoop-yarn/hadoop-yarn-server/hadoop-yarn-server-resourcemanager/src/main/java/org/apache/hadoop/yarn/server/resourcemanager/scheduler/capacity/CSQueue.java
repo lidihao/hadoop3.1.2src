@@ -158,6 +158,7 @@ public interface CSQueue extends SchedulerQueue<CSQueue> {
   public boolean hasAccess(QueueACL acl, UserGroupInformation user);
   
   /**
+   * 提交一个Apps
    * Submit a new application to the queue.
    * @param applicationId the applicationId of the application being submitted
    * @param user user who submitted the application
@@ -167,6 +168,7 @@ public interface CSQueue extends SchedulerQueue<CSQueue> {
       String queue) throws AccessControlException;
 
   /**
+   * 提交一个ApplicationAttemp
    * Submit an application attempt to the queue.
    */
   public void submitApplicationAttempt(FiCaSchedulerApp application,

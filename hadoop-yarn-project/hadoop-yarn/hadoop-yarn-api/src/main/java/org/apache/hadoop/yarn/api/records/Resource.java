@@ -37,6 +37,7 @@ import org.apache.hadoop.yarn.exceptions.ResourceNotFoundException;
 import org.apache.hadoop.yarn.util.resource.ResourceUtils;
 
 /**
+ *代表集群的一个资源
  * <p><code>Resource</code> models a set of computer resources in the 
  * cluster.</p>
  * 
@@ -62,7 +63,7 @@ import org.apache.hadoop.yarn.util.resource.ResourceUtils;
 @Public
 @Stable
 public abstract class Resource implements Comparable<Resource> {
-
+  // 每一种资源的信息
   protected ResourceInformation[] resources = null;
 
   // Number of mandatory resources, this is added to avoid invoke

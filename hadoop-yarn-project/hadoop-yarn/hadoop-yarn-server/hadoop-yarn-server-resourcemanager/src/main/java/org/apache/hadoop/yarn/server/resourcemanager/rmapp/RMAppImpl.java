@@ -149,6 +149,7 @@ public class RMAppImpl implements RMApp, Recoverable {
   private final Map<ApplicationAttemptId, RMAppAttempt> attempts
       = new LinkedHashMap<ApplicationAttemptId, RMAppAttempt>();
   private final long submitTime;
+  // 存储状态发生变化的节点
   private final Map<RMNode, NodeUpdateType> updatedNodes = new HashMap<>();
   private final String applicationType;
   private final Set<String> applicationTags;
@@ -175,6 +176,7 @@ public class RMAppImpl implements RMApp, Recoverable {
   // This field isn't protected by readlock now.
   private volatile RMAppAttempt currentAttempt;
   private String queue;
+  // 事件输入器
   private EventHandler handler;
   private static final AppFinishedTransition FINISHED_TRANSITION =
       new AppFinishedTransition();
@@ -211,7 +213,7 @@ public class RMAppImpl implements RMApp, Recoverable {
   Object transitionTodo;
 
   private Priority applicationPriority;
-
+  //StateMachineFactory
   private static final StateMachineFactory<RMAppImpl,
                                            RMAppState,
                                            RMAppEventType,
@@ -225,6 +227,7 @@ public class RMAppImpl implements RMApp, Recoverable {
      // Transitions from NEW state
     .addTransition(RMAppState.NEW, RMAppState.NEW,
         RMAppEventType.NODE_UPDATE, new RMAppNodeUpdateTransition())
+          //记录Application的信息
     .addTransition(RMAppState.NEW, RMAppState.NEW_SAVING,
         RMAppEventType.START, new RMAppNewlySavingTransition())
     .addTransition(RMAppState.NEW, EnumSet.of(RMAppState.SUBMITTED,
@@ -241,6 +244,7 @@ public class RMAppImpl implements RMApp, Recoverable {
     // Transitions from NEW_SAVING state
     .addTransition(RMAppState.NEW_SAVING, RMAppState.NEW_SAVING,
         RMAppEventType.NODE_UPDATE, new RMAppNodeUpdateTransition())
+          // 提交到调度器
     .addTransition(RMAppState.NEW_SAVING, RMAppState.SUBMITTED,
         RMAppEventType.APP_NEW_SAVED, new AddApplicationToSchedulerTransition())
     .addTransition(RMAppState.NEW_SAVING, RMAppState.FINAL_SAVING,
@@ -1251,7 +1255,7 @@ public class RMAppImpl implements RMApp, Recoverable {
             + ApplicationTimeoutType.LIFETIME + " value=" + applicationLifetime
             + " seconds");
       }
-
+      // 将Application的状态存储起来
       // If recovery is enabled then store the application information in a
       // non-blocking call so make sure that RM has stored the information
       // needed to restart the AM after RM restart without further client

@@ -54,6 +54,7 @@ import org.apache.hadoop.yarn.util.resource.ResourceCalculator;
 import com.google.common.util.concurrent.SettableFuture;
 
 /**
+ * 分配资源或者回收资源
  * This interface is used by the components to talk to the
  * scheduler for allocating of resources, cleaning up resources.
  *

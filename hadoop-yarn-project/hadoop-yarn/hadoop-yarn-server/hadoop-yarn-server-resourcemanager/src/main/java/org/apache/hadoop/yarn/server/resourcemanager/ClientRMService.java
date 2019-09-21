@@ -200,8 +200,11 @@ public class ClientRMService extends AbstractService implements
 
   //记录Application的个数
   final private AtomicInteger applicationCounter = new AtomicInteger(0);
+  //资源调度器
   final private YarnScheduler scheduler;
+  //ResourceManager上下文
   final private RMContext rmContext;
+  // 负责程序的启动和关闭
   private final RMAppManager rmAppManager;
 
   private Server server;
@@ -209,13 +212,16 @@ public class ClientRMService extends AbstractService implements
 
   private final RecordFactory recordFactory = RecordFactoryProvider.getRecordFactory(null);
   private InetSocketAddress clientBindAddress;
-
+  // 管理Application的权限
   private final ApplicationACLsManager applicationsACLsManager;
+  // 队列ACL的管理
   private final QueueACLsManager queueACLsManager;
 
   // For Reservation APIs
   private Clock clock;
+  // 保留资源系统
   private ReservationSystem reservationSystem;
+  //
   private ReservationInputValidator rValidator;
 
   private boolean filterAppsByUser = false;
@@ -249,7 +255,7 @@ public class ClientRMService extends AbstractService implements
     this.rValidator = new ReservationInputValidator(clock);
     resourceProfilesManager = rmContext.getResourceProfilesManager();
   }
-
+  // 获取ClientServer的绑定接口
   @Override
   protected void serviceInit(Configuration conf) throws Exception {
     clientBindAddress = getBindAddress(conf);
@@ -260,6 +266,7 @@ public class ClientRMService extends AbstractService implements
   protected void serviceStart() throws Exception {
     Configuration conf = getConfig();
     YarnRPC rpc = YarnRPC.create(conf);
+    // 开启服务
     this.server =   
       rpc.getServer(ApplicationClientProtocol.class, this,
             clientBindAddress,
@@ -319,6 +326,7 @@ public class ClientRMService extends AbstractService implements
   }
 
   /**
+   * 检查调用用户是否有权限访问这个App的信息
    * check if the calling user has the access to application information.
    * @param callerUGI the user information who submit the request
    * @param owner the user of the application
@@ -335,7 +343,7 @@ public class ClientRMService extends AbstractService implements
         .checkAccess(callerUGI, QueueACL.ADMINISTER_QUEUE, application,
             Server.getRemoteAddress(), null);
   }
-
+  //产生一个新的ApplicationId
   ApplicationId getNewApplicationId() {
     ApplicationId applicationId = org.apache.hadoop.yarn.server.utils.BuilderUtils
         .newApplicationId(recordFactory, ResourceManager.getClusterTimeStamp(),
@@ -397,7 +405,7 @@ public class ClientRMService extends AbstractService implements
     response.setApplicationReport(report);
     return response;
   }
-
+  //
   @Override
   public GetApplicationAttemptReportResponse getApplicationAttemptReport(
       GetApplicationAttemptReportRequest request) throws YarnException,
@@ -546,7 +554,7 @@ public class ClientRMService extends AbstractService implements
     }
     return response;
   }
-
+  //提交任务
   @Override
   public SubmitApplicationResponse submitApplication(
       SubmitApplicationRequest request) throws YarnException, IOException {
@@ -646,6 +654,7 @@ public class ClientRMService extends AbstractService implements
 
     try {
       // call RMAppManager to submit application directly
+      // 提交到RMAppManager
       rmAppManager.submitApplication(submissionContext,
           System.currentTimeMillis(), user);
 

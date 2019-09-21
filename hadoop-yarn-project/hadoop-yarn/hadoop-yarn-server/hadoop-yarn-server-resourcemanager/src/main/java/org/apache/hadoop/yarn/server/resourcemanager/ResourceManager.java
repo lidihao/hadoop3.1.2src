@@ -168,6 +168,7 @@ public class ResourceManager extends CompositeService
    */
   @VisibleForTesting
   protected RMContextImpl rmContext;
+  // 中央调度器
   private Dispatcher rmDispatcher;
   @VisibleForTesting
   protected AdminService adminService;
@@ -426,6 +427,7 @@ public class ResourceManager extends CompositeService
     rmContext.setStateStore(rmStore);
   }
 
+  //处理SchedulerEvent
   protected EventHandler<SchedulerEvent> createSchedulerEventDispatcher() {
     return new EventDispatcher(this.scheduler, "SchedulerEventDispatcher");
   }
@@ -435,6 +437,7 @@ public class ResourceManager extends CompositeService
   }
 
   protected ResourceScheduler createScheduler() {
+    // 在配置文件里获取Scheduler的className,通过反射获取
     String schedulerClassName = conf.get(YarnConfiguration.RM_SCHEDULER,
         YarnConfiguration.DEFAULT_RM_SCHEDULER);
     LOG.info("Using Scheduler: " + schedulerClassName);
@@ -712,6 +715,7 @@ public class ResourceManager extends CompositeService
       rmContext.setNodesListManager(nodesListManager);
 
       // Initialize the scheduler
+      // 创建调度器
       scheduler = createScheduler();
       scheduler.setRMContext(rmContext);
       addIfService(scheduler);
@@ -980,7 +984,7 @@ public class ResourceManager extends CompositeService
       }
     }
   }
-
+  // ApplicationEvent分发器
   @Private
   public static final class ApplicationEventDispatcher implements
       EventHandler<RMAppEvent> {

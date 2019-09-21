@@ -43,6 +43,8 @@ import org.apache.hadoop.yarn.server.resourcemanager.blacklist.BlacklistManager;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.RMApp;
 
 /**
+ * Application可能会尝试运行多次，每次运行被称为一次“运行尝试"(也就是运行实例)
+ *
  * Interface to an Application Attempt in the Resource Manager.
  * A {@link RMApp} can have multiple app attempts based on
  * {@link YarnConfiguration#RM_AM_MAX_ATTEMPTS}. For specific

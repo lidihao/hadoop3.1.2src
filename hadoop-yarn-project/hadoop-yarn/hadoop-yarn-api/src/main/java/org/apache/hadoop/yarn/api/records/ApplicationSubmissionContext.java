@@ -36,6 +36,7 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.util.Records;
 
 /**
+ * 代表app启动的所有信息
  * {@code ApplicationSubmissionContext} represents all of the
  * information needed by the {@code ResourceManager} to launch
  * the {@code ApplicationMaster} for an application.
