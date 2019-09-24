@@ -25,6 +25,7 @@ import org.apache.hadoop.yarn.server.resourcemanager.scheduler.SchedulerNode;
 import org.apache.hadoop.yarn.server.scheduler.SchedulerRequestKey;
 
 /**
+ * Container在Scheduler中的调度形式
  * Contexts for a container inside scheduler
  */
 public class SchedulerContainer<A extends SchedulerApplicationAttempt,
@@ -33,6 +34,7 @@ public class SchedulerContainer<A extends SchedulerApplicationAttempt,
   private String nodePartition;
   private A schedulerApplicationAttempt;
   private N schedulerNode;
+  // 是分配的还是资源预定的?
   private boolean allocated; // Allocated (True) or reserved (False)
 
   public SchedulerContainer(A app, N node, RMContainer rmContainer,

@@ -668,6 +668,7 @@ public class AppSchedulingInfo {
   }
 
   /*
+   *在异步环境，正在处理的请求也有可能更新
    * In async environment, pending resource request could be updated during
    * scheduling, this method checks pending request before allocating
    */

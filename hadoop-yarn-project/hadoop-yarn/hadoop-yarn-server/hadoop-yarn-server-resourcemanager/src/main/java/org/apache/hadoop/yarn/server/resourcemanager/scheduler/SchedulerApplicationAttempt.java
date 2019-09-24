@@ -628,6 +628,7 @@ public class SchedulerApplicationAttempt implements SchedulableEntity {
   }
   
   @SuppressWarnings("unchecked")
+  // 在节点上启动Contain
   public void containerLaunchedOnNode(ContainerId containerId,
       NodeId nodeId) {
     try {

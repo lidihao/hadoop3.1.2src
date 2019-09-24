@@ -115,6 +115,7 @@ public class ContainersLauncher extends AbstractService
     Container container = event.getContainer();
     ContainerId containerId = container.getContainerId();
     switch (event.getType()) {
+      //启动CONTAINER
       case LAUNCH_CONTAINER:
         Application app =
           context.getApplications().get(
@@ -126,6 +127,7 @@ public class ContainersLauncher extends AbstractService
         containerLauncher.submit(launch);
         running.put(containerId, launch);
         break;
+        // 重启Container
       case RELAUNCH_CONTAINER:
         app = context.getApplications().get(
                 containerId.getApplicationAttemptId().getApplicationId());
@@ -136,6 +138,7 @@ public class ContainersLauncher extends AbstractService
         containerLauncher.submit(relaunch);
         running.put(containerId, relaunch);
         break;
+        // 恢复Container
       case RECOVER_CONTAINER:
         app = context.getApplications().get(
             containerId.getApplicationAttemptId().getApplicationId());
@@ -144,6 +147,7 @@ public class ContainersLauncher extends AbstractService
         containerLauncher.submit(launch);
         running.put(containerId, launch);
         break;
+        // 恢复暂停Container
       case RECOVER_PAUSED_CONTAINER:
         app = context.getApplications().get(
             containerId.getApplicationAttemptId().getApplicationId());
@@ -166,7 +170,7 @@ public class ContainersLauncher extends AbstractService
                   "Container terminated before launch."));
           return;
         }
-
+        //通过发送信号量来杀死进程
         // Cleanup a container whether it is running/killed/completed, so that
         // no sub-processes are alive.
         try {
@@ -176,6 +180,7 @@ public class ContainersLauncher extends AbstractService
               + ". Ignoring.");
         }
         break;
+      //通过发送信号量来杀死进程
       case SIGNAL_CONTAINER:
         SignalContainersLauncherEvent signalEvent =
             (SignalContainersLauncherEvent) event;

@@ -102,15 +102,17 @@ public class AMLauncher implements Runnable {
   }
 
   private void launch() throws IOException, YarnException {
+    // 连接相对应的Node,通过ContainerManagementProtocol进行沟通
     connect();
     ContainerId masterContainerID = masterContainer.getId();
     ApplicationSubmissionContext applicationContext =
         application.getSubmissionContext();
     LOG.info("Setting up container " + masterContainer
         + " for AM " + application.getAppAttemptId());
+    // 创建Container启动上下文
     ContainerLaunchContext launchContext =
         createAMContainerLaunchContext(applicationContext, masterContainerID);
-
+    // 创建启动Container的ContainerRequest
     StartContainerRequest scRequest =
         StartContainerRequest.newInstance(launchContext,
           masterContainer.getContainerToken());
@@ -118,7 +120,7 @@ public class AMLauncher implements Runnable {
     list.add(scRequest);
     StartContainersRequest allRequests =
         StartContainersRequest.newInstance(list);
-
+    // rpc调用启动Container
     StartContainersResponse response =
         containerMgrProxy.startContainers(allRequests);
     if (response.getFailedRequests() != null
@@ -306,6 +308,7 @@ public class AMLauncher implements Runnable {
       try {
         LOG.info("Launching master" + application.getAppAttemptId());
         launch();
+        // 通知AppAttempt已经启动RMAppAttempt
         handler.handle(new RMAppAttemptEvent(application.getAppAttemptId(),
             RMAppAttemptEventType.LAUNCHED));
       } catch(Exception ie) {

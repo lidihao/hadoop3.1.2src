@@ -59,6 +59,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 维持一系列可以运行的Containers,
+ * 当条件满足，他会启动这些容器
  * The ContainerScheduler manages a collection of runnable containers. It
  * ensures that a container is launched only if all its launch criteria are
  * met. It also ensures that OPPORTUNISTIC containers are killed to make

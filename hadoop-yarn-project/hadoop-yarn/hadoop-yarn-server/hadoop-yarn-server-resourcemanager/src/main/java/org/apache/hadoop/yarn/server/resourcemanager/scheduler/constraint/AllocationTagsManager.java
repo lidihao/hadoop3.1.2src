@@ -43,6 +43,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.LongBinaryOperator;
 
 /**
+ * 记录application获取的Container所在集群和机架
  * In-memory mapping between applications/container-tags and nodes/racks.
  * Required by constrained affinity/anti-affinity and cardinality placement.
  */

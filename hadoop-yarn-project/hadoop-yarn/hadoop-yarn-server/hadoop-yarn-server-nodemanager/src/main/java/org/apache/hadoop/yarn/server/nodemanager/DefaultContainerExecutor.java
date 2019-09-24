@@ -66,6 +66,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
 /**
+ * 通过ProcessBuilder来执行
  * The {@code DefaultContainerExecuter} class offers generic container
  * execution services. Process execution is handled in a platform-independent
  * way via {@link ProcessBuilder}.
@@ -215,8 +216,11 @@ public class DefaultContainerExecutor extends ContainerExecutor {
     Path nmPrivateContainerScriptPath = ctx.getNmPrivateContainerScriptPath();
     Path nmPrivateTokensPath = ctx.getNmPrivateTokensPath();
     String user = ctx.getUser();
+    // 工作目录
     Path containerWorkDir = ctx.getContainerWorkDir();
+    // 本地目录
     List<String> localDirs = ctx.getLocalDirs();
+    //日志目录
     List<String> logDirs = ctx.getLogDirs();
 
     FsPermission dirPerm = new FsPermission(APPDIR_PERM);

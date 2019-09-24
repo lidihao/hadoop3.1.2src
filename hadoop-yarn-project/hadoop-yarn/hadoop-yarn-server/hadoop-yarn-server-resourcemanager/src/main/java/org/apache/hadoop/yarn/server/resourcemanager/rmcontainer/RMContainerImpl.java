@@ -579,7 +579,7 @@ public class RMContainerImpl implements RMContainer {
       container.rmContext.getAllocationTagsManager().addContainer(
           container.getNodeId(), container.getContainerId(),
           container.getAllocationTags());
-
+      // 通知AppAttemp，已有容器分配了
       container.eventHandler.handle(
           new RMAppAttemptEvent(container.appAttemptId,
               RMAppAttemptEventType.CONTAINER_ALLOCATED));
@@ -602,6 +602,7 @@ public class RMContainerImpl implements RMContainer {
           new AllocationExpirationInfo(container.getContainerId()));
 
       // Tell the app
+      // 告诉App已经获取到容器了
       container.eventHandler.handle(new RMAppRunningOnNodeEvent(container
           .getApplicationAttemptId().getApplicationId(), container.nodeId));
 

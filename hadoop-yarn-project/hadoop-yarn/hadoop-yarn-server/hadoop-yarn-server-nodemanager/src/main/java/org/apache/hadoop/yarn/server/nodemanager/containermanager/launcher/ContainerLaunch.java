@@ -202,11 +202,13 @@ public class ContainerLaunch implements Callable<Integer> {
     final ContainerLaunchContext launchContext = container.getLaunchContext();
     ContainerId containerID = container.getContainerId();
     String containerIdStr = containerID.toString();
+    // 命令
     final List<String> command = launchContext.getCommands();
     int ret = -1;
 
     Path containerLogDir;
     try {
+      // 获取本地资源文件,jar包，配置文件等
       Map<Path, List<String>> localResources = getLocalizedResources();
 
       final String user = container.getUser();
@@ -214,6 +216,7 @@ public class ContainerLaunch implements Callable<Integer> {
       // Before the container script gets written out.
       List<String> newCmds = new ArrayList<String>(command.size());
       String appIdStr = app.getAppId().toString();
+      // 日志路径
       String relativeContainerLogDir = ContainerLaunch
           .getRelativeContainerLogDir(appIdStr, containerIdStr);
       containerLogDir =
@@ -307,7 +310,7 @@ public class ContainerLaunch implements Callable<Integer> {
         creds.writeTokenStorageToStream(tokensOutStream);
       }
       // /////////// End of writing out container-tokens
-
+      // 启动容器
       ret = launchContainer(new ContainerStartContext.Builder()
           .setContainer(container)
           .setLocalizedResources(localResources)
@@ -731,6 +734,7 @@ public class ContainerLaunch implements Callable<Integer> {
   }
   
   /**
+   * 杀死Container
    * Cleanup the container.
    * Cancels the launch if launch has not started yet or signals
    * the executor to not execute the process if not already done so.
@@ -785,6 +789,7 @@ public class ContainerLaunch implements Callable<Integer> {
       // kill process
       String user = container.getUser();
       if (processId != null) {
+        // 使用信号量杀死进程
         signalProcess(processId, user, containerIdStr);
       } else {
         // Normally this means that the process was notified about

@@ -29,19 +29,25 @@ import java.util.List;
 public class ResourceCommitRequest<A extends SchedulerApplicationAttempt,
     N extends SchedulerNode> {
   // New containers to be allocated
+  // 分配的容器
   private List<ContainerAllocationProposal<A, N>> containersToAllocate =
       Collections.emptyList();
 
   // New containers to be released
+  // 预定的容器
   private List<ContainerAllocationProposal<A, N>> containersToReserve =
       Collections.emptyList();
 
   // We don't need these containers anymore
+  // 释放的容器
   private List<SchedulerContainer<A, N>> toReleaseContainers =
       Collections.emptyList();
 
+  // 分配的总资源
   private Resource totalAllocatedResource;
+  // 预定的总资源
   private Resource totalReservedResource;
+  // 释放的总资源
   private Resource totalReleasedResource;
 
   public ResourceCommitRequest(

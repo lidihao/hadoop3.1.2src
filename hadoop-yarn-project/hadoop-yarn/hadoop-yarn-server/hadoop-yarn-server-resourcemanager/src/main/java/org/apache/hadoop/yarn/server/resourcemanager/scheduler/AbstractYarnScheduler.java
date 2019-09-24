@@ -1098,6 +1098,7 @@ public abstract class AbstractYarnScheduler
   }
 
   /**
+   * 处理node来的心跳请求
    * Process a heartbeat update from a node.
    * @param nm The RMNode corresponding to the NodeManager
    */
@@ -1111,6 +1112,7 @@ public abstract class AbstractYarnScheduler
     // NOTICE: it is possible to not find the NodeID as a node can be
     // decommissioned at the same time. Skip updates if node is null.
     SchedulerNode schedulerNode = getNode(nm.getNodeID());
+    // 启动新的容器
     List<ContainerStatus> completedContainers = updateNewContainerInfo(nm,
         schedulerNode);
 
@@ -1120,6 +1122,7 @@ public abstract class AbstractYarnScheduler
     }
 
     // Process completed containers
+    // 处理完成的containers
     Resource releasedResources = Resource.newInstance(0, 0);
     int releasedContainers = updateCompletedContainers(completedContainers,
         releasedResources, nm.getNodeID(), schedulerNode);
@@ -1127,6 +1130,7 @@ public abstract class AbstractYarnScheduler
     // If the node is decommissioning, send an update to have the total
     // resource equal to the used resource, so no available resource to
     // schedule.
+    // node下线
     if (nm.getState() == NodeState.DECOMMISSIONING && schedulerNode != null) {
       this.rmContext
           .getDispatcher()

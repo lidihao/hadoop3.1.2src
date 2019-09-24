@@ -253,6 +253,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
             new UnexpectedAMRegisteredTransition(), RMAppAttemptState.FAILED))
           
        // Transitions from SCHEDULED State
+          // 分配到容器
       .addTransition(RMAppAttemptState.SCHEDULED,
           EnumSet.of(RMAppAttemptState.ALLOCATED_SAVING,
             RMAppAttemptState.SCHEDULED),
@@ -274,6 +275,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
             RMAppAttemptState.FAILED))
 
        // Transitions from ALLOCATED_SAVING State
+          //RMStateStore发起这个事件，保存好了状态
       .addTransition(RMAppAttemptState.ALLOCATED_SAVING, 
           RMAppAttemptState.ALLOCATED,
           RMAppAttemptEventType.ATTEMPT_NEW_SAVED, new AttemptStoredTransition())
@@ -1569,6 +1571,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
       appAttempt
           .updateAMLaunchDiagnostics(AMState.LAUNCHED.getDiagnosticMessage());
       // Register with AMLivelinessMonitor
+      // 注册到AMLivelinessMonitor
       appAttempt.attemptLaunched();
 
     }
@@ -2203,7 +2206,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
     }
     return RMServerUtils.createApplicationAttemptState(state);
   }
-
+  //启动AM
   private void launchAttempt(){
     launchAMStartTime = System.currentTimeMillis();
     // Send event to launch the AM Container

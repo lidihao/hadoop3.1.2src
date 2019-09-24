@@ -128,6 +128,7 @@ public interface YarnScheduler extends EventHandler<SchedulerEvent> {
   public int getNumClusterNodes();
   
   /**
+   * 请求新的资源或者释放资源
    * The main api between the ApplicationMaster and the Scheduler.
    * The ApplicationMaster is updating his future resource requirements
    * and may release containers he doens't need.

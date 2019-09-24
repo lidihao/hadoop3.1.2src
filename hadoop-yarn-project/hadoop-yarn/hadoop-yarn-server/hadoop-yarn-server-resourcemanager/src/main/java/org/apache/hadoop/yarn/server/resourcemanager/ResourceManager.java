@@ -170,6 +170,7 @@ public class ResourceManager extends CompositeService
   protected RMContextImpl rmContext;
   // 中央调度器
   private Dispatcher rmDispatcher;
+  // 执行管理员的命令
   @VisibleForTesting
   protected AdminService adminService;
 
@@ -181,17 +182,27 @@ public class ResourceManager extends CompositeService
    * RM is active when (1) HA is disabled, or (2) HA is enabled and the RM is
    * in Active state.
    */
+  // 在Active的ResourceManager上运行
   protected RMActiveServices activeServices;
+  // 管理秘钥
   protected RMSecretManagerService rmSecretManagerService;
-
+  // 资源调度器
   protected ResourceScheduler scheduler;
+  // 预定资源系统
   protected ReservationSystem reservationSystem;
+  // 接受Client端的处理
   private ClientRMService clientRM;
+  // 接受ApplicationMaster的请求
   protected ApplicationMasterService masterService;
+  // 监控NodeManager
   protected NMLivelinessMonitor nmLivelinessMonitor;
+  // 管理NodeManager白名单和黑名单
   protected NodesListManager nodesListManager;
+  // 管理Application
   protected RMAppManager rmAppManager;
+  // Applicaiton的权限管理
   protected ApplicationACLsManager applicationACLsManager;
+  // 队列权限管理
   protected QueueACLsManager queueACLsManager;
   private FederationStateStoreService federationStateStoreService;
   private WebApp webApp;
@@ -258,6 +269,7 @@ public class ResourceManager extends CompositeService
     rmContext.setConfigurationProvider(configurationProvider);
 
     // load core-site.xml
+    // 加载core-site.xml
     loadConfigurationXml(YarnConfiguration.CORE_SITE_CONFIGURATION_FILE);
 
     // Do refreshSuperUserGroupsConfiguration with loaded core-site.xml
@@ -267,11 +279,13 @@ public class ResourceManager extends CompositeService
     ProxyUsers.refreshSuperUserGroupsConfiguration(this.conf);
 
     // load yarn-site.xml
+    // 加载yarn-site.xml配置
     loadConfigurationXml(YarnConfiguration.YARN_SITE_CONFIGURATION_FILE);
 
     validateConfigs(this.conf);
     
     // Set HA configuration should be done before login
+    // 是否开启HA配置
     this.rmContext.setHAEnabled(HAUtil.isHAEnabled(this.conf));
     if (this.rmContext.isHAEnabled()) {
       HAUtil.verifyAndSetConfiguration(this.conf);
@@ -286,7 +300,7 @@ public class ResourceManager extends CompositeService
     } catch(IOException ie) {
       throw new YarnRuntimeException("Failed to login", ie);
     }
-
+    // 注册事件处理器
     // register the handlers for all AlwaysOn services using setupDispatcher().
     rmDispatcher = setupDispatcher();
     addIfService(rmDispatcher);
@@ -785,7 +799,7 @@ public class ResourceManager extends CompositeService
       clientRM = createClientRMService();
       addService(clientRM);
       rmContext.setClientRMService(clientRM);
-
+      // 用于启动AM
       applicationMasterLauncher = createAMLauncher();
       rmDispatcher.register(AMLauncherEventType.class,
           applicationMasterLauncher);

@@ -407,7 +407,7 @@ public class FiCaSchedulerApp extends SchedulerApplicationAttempt {
 
     return true;
   }
-
+  // 检查这个Application是否可以分配到这个Container
   public boolean accept(Resource cluster,
       ResourceCommitRequest<FiCaSchedulerApp, FiCaSchedulerNode> request,
       boolean checkPending) {
@@ -448,12 +448,14 @@ public class FiCaSchedulerApp extends SchedulerApplicationAttempt {
           }
           return false;
         }
+        // 容器分配
         if (schedulerContainer.isAllocated()) {
           // When allocate a new container
           containerRequest =
               schedulerContainer.getRmContainer().getContainerRequest();
 
           // Check pending resource request
+          // 在异步环境，正在处理的请求也有可能更新
           if (checkPending &&
               !appSchedulingInfo.checkAllocation(
                   allocation.getAllocationLocalityType(),
@@ -612,10 +614,10 @@ public class FiCaSchedulerApp extends SchedulerApplicationAttempt {
 
           attemptResourceUsage.incUsed(schedulerContainer.getNodePartition(),
               allocation.getAllocatedOrReservedResource());
-
+          // 启动容器
           rmContainer.handle(
               new RMContainerEvent(containerId, RMContainerEventType.START));
-
+          // 通知Node已经分配了资源
           // Inform the node
           schedulerContainer.getSchedulerNode().allocateContainer(
               rmContainer);

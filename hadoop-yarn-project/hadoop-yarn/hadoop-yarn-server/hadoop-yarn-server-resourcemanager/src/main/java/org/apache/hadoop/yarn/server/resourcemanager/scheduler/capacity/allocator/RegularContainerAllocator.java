@@ -885,6 +885,7 @@ public class RegularContainerAllocator extends AbstractContainerAllocator {
       }
       
       // Schedule in priority order
+      // 根据
       for (SchedulerRequestKey schedulerKey : application.getSchedulerKeys()) {
         ContainerAllocation result = allocate(clusterResource, candidates,
             schedulingMode, resourceLimits, schedulerKey, null);

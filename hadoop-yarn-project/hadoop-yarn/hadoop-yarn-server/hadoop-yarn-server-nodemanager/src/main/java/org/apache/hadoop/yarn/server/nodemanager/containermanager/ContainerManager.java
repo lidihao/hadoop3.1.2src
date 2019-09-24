@@ -30,6 +30,7 @@ import org.apache.hadoop.yarn.server.nodemanager.containermanager.scheduler
     .ContainerScheduler;
 
 /**
+ * 维护Containers的生命周期
  * The ContainerManager is an entity that manages the life cycle of Containers.
  */
 public interface ContainerManager extends ServiceStateChangeListener,

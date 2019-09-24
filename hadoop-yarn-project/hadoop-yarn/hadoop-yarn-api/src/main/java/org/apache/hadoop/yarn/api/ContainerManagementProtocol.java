@@ -50,6 +50,7 @@ import org.apache.hadoop.yarn.api.records.ContainerStatus;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 
 /**
+ * ApplicationMaster与NodeManager进行交流
  * <p>The protocol between an <code>ApplicationMaster</code> and a 
  * <code>NodeManager</code> to start/stop and increase resource of containers
  * and to get status of running containers.</p>

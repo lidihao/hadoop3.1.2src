@@ -26,6 +26,7 @@ import org.apache.hadoop.yarn.server.nodemanager.containermanager.loghandler.eve
 
 import java.util.Set;
 
+// 可以拔插的组件，处理日志打印
 public interface LogHandler extends EventHandler<LogHandlerEvent> {
   public void handle(LogHandlerEvent event);
 

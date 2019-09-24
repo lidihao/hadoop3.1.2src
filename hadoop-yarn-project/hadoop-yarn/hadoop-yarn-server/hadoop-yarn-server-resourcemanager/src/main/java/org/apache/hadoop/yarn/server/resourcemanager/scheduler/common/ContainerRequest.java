@@ -24,6 +24,7 @@ import org.apache.hadoop.yarn.api.records.SchedulingRequest;
 import java.util.List;
 
 /**
+ * 绑定创建这个Contain的请求,用于Container的抢占和删除在AM获取这个Container之前
  * ContainerRequest is a class to capture resource requests associated with a
  * Container, this will be used by scheduler to recover resource requests if the
  * container preempted or cancelled before AM acquire the container.
