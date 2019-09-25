@@ -285,7 +285,7 @@ public abstract class ApplicationSubmissionContext {
   @Stable
   public abstract void setAMContainerSpec(ContainerLaunchContext amContainer);
   
-  /**
+  /**是否由客户端启动ApplicaitoinMaster
    * Get if the RM should manage the execution of the AM. 
    * If true, then the RM 
    * will not allocate a container for the AM and start it. It will expect the 
@@ -491,6 +491,7 @@ public abstract class ApplicationSubmissionContext {
   public abstract void setAMContainerResourceRequest(ResourceRequest request);
 
   /**
+   * 获取ApplicationMaster所需的资源
    * Get the ResourceRequests of the AM container.
    *
    * If this is not null, scheduler will use this to acquire resource for AM

@@ -109,6 +109,7 @@ public class SchedulerApplicationAttempt implements SchedulableEntity {
   private static final long MEM_AGGREGATE_ALLOCATION_CACHE_MSECS = 3000;
   protected long lastMemoryAggregateAllocationUpdateTime = 0;
   private Map<String, Long> lastResourceSecondsMap = new HashMap<>();
+  // 调度信息
   protected final AppSchedulingInfo appSchedulingInfo;
   protected ApplicationAttemptId attemptId;
   protected Map<ContainerId, RMContainer> liveContainers =
@@ -126,7 +127,7 @@ public class SchedulerApplicationAttempt implements SchedulableEntity {
 
   private volatile Priority appPriority = null;
   private boolean isAttemptRecovering;
-
+  // 资源利用情况
   protected ResourceUsage attemptResourceUsage = new ResourceUsage();
   /** Resource usage of opportunistic containers. */
   protected ResourceUsage attemptOpportunisticResourceUsage =

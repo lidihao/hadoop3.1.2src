@@ -350,6 +350,7 @@ public class RegularContainerAllocator extends AbstractContainerAllocator {
     }
 
     // Check if we need containers on this host
+    // 有本地化的资源请求
     if (type == NodeType.NODE_LOCAL) {
       // Now check if we need containers on this host...
       return application.getOutstandingAsksCount(schedulerKey,
@@ -428,6 +429,7 @@ public class RegularContainerAllocator extends AbstractContainerAllocator {
         application.getPendingAsk(schedulerKey, node.getNodeName());
     if (nodeLocalAsk.getCount() > 0) {
       requestLocalityType = NodeType.NODE_LOCAL;
+      // 本地
       allocation =
           assignNodeLocalContainers(clusterResource, nodeLocalAsk,
               node, schedulerKey, reservedContainer, schedulingMode,
@@ -440,6 +442,7 @@ public class RegularContainerAllocator extends AbstractContainerAllocator {
     }
 
     // Rack-local
+    // 机架
     PendingAsk rackLocalAsk =
         application.getPendingAsk(schedulerKey, node.getRackName());
     if (rackLocalAsk.getCount() > 0) {
@@ -466,6 +469,7 @@ public class RegularContainerAllocator extends AbstractContainerAllocator {
     }
 
     // Off-switch
+    // 随机分配
     PendingAsk offSwitchAsk =
         application.getPendingAsk(schedulerKey, ResourceRequest.ANY);
     if (offSwitchAsk.getCount() > 0) {
@@ -842,12 +846,12 @@ public class RegularContainerAllocator extends AbstractContainerAllocator {
     }
 
     result = ContainerAllocation.PRIORITY_SKIPPED;
-
+    // 获取PreferredNode
     Iterator<FiCaSchedulerNode> iter = schedulingPS.getPreferredNodeIterator(
         candidates);
     while (iter.hasNext()) {
       FiCaSchedulerNode node = iter.next();
-
+      // 尝试分配资源
       result = tryAllocateOnNode(clusterResource, node, schedulingMode,
           resourceLimits, schedulerKey, reservedContainer);
 
@@ -887,6 +891,7 @@ public class RegularContainerAllocator extends AbstractContainerAllocator {
       // Schedule in priority order
       // 根据
       for (SchedulerRequestKey schedulerKey : application.getSchedulerKeys()) {
+        // 分配资源
         ContainerAllocation result = allocate(clusterResource, candidates,
             schedulingMode, resourceLimits, schedulerKey, null);
 

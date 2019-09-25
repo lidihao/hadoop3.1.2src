@@ -84,12 +84,14 @@ public abstract class AbstractContainerAllocator {
     assignment.setRequestLocalityType(result.requestLocalityType);
 
     // If we allocated something
+    // 分配到资源
     if (Resources.greaterThan(rc, clusterResource,
         result.getResourceToBeAllocated(), Resources.none())) {
       Resource allocatedResource = result.getResourceToBeAllocated();
       RMContainer updatedContainer = result.getUpdatedContainer();
 
       assignment.setResource(allocatedResource);
+      // Container类型：local，rack
       assignment.setType(result.getContainerNodeType());
 
       if (result.getAllocationState() == AllocationState.RESERVED) {

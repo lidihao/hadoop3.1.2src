@@ -23,6 +23,7 @@ package org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity;
  */
 public enum SchedulingMode {
   /**
+   * 受Node的Label约束
    * <p>
    * When a node has partition (say partition=x), only application in the queue
    * can access to partition=x AND requires for partition=x resource can get
@@ -37,6 +38,7 @@ public enum SchedulingMode {
   RESPECT_PARTITION_EXCLUSIVITY,
   
   /**
+   * 不受Node的Label约束
    * Only used when a node has partition AND the partition isn't an exclusive
    * partition AND application requires non-partitioned resource.
    */

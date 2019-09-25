@@ -1187,7 +1187,7 @@ public class CapacityScheduler extends
       }
 
       application.updateBlacklist(blacklistAdditions, blacklistRemovals);
-      // 获取App分配资源的概况
+
       allocation = application.getAllocation(getResourceCalculator(),
           getClusterResource(), getMinimumResourceCapability());
     } finally {
@@ -1255,7 +1255,7 @@ public class CapacityScheduler extends
         // work
         updateSchedulerHealth(lastNodeUpdateTime, rmNode.getNodeID(),
             CSAssignment.NULL_ASSIGNMENT);
-        //触发调度
+
         allocateContainersToNode(rmNode.getNodeID(), true);
         ActivitiesLogger.NODE.finishNodeUpdateRecording(activitiesManager,
             rmNode.getNodeID());
@@ -1402,7 +1402,6 @@ public class CapacityScheduler extends
           withNodeHeartbeat);
       // Only check if we can allocate more container on the same node when
       // scheduling is triggered by node heartbeat
-        // 由withNodeHeartbeat触发将会分配更多资源
       if (null != assignment && withNodeHeartbeat) {
         if (assignment.getType() == NodeType.OFF_SWITCH) {
           offswitchCount++;
@@ -1553,7 +1552,6 @@ public class CapacityScheduler extends
   private CSAssignment allocateOrReserveNewContainers(
       CandidateNodeSet<FiCaSchedulerNode> candidates,
       boolean withNodeHeartbeat) {
-      // 逻辑分配获取到资源
     CSAssignment assignment = getRootQueue().assignContainers(
         getClusterResource(), candidates, new ResourceLimits(labelManager
             .getResourceByLabel(candidates.getPartition(),
@@ -1561,7 +1559,6 @@ public class CapacityScheduler extends
         SchedulingMode.RESPECT_PARTITION_EXCLUSIVITY);
 
     assignment.setSchedulingMode(SchedulingMode.RESPECT_PARTITION_EXCLUSIVITY);
-    // 提交资源
     submitResourceCommitRequest(getClusterResource(), assignment);
 
     if (Resources.greaterThan(calculator, getClusterResource(),
@@ -1698,7 +1695,6 @@ public class CapacityScheduler extends
     break;
     case NODE_UPDATE:
     {
-      // 处理Node_update事件,例如启动容器
       NodeUpdateSchedulerEvent nodeUpdatedEvent = (NodeUpdateSchedulerEvent)event;
       nodeUpdate(nodeUpdatedEvent.getRMNode());
     }
@@ -1708,7 +1704,6 @@ public class CapacityScheduler extends
     {
       AppAddedSchedulerEvent appAddedEvent = (AppAddedSchedulerEvent) event;
       // 解析出任务提交到的队列
-      // 解析出App提交到队列
       String queueName = resolveReservationQueueName(appAddedEvent.getQueue(),
           appAddedEvent.getApplicationId(), appAddedEvent.getReservationID(),
           appAddedEvent.getIsAppRecovering());
@@ -1718,7 +1713,6 @@ public class CapacityScheduler extends
               appAddedEvent.getUser(), appAddedEvent.getApplicatonPriority(),
               appAddedEvent.getPlacementContext());
         } else {
-          // 恢复元数据
           addApplicationOnRecovery(appAddedEvent.getApplicationId(), queueName,
               appAddedEvent.getUser(), appAddedEvent.getApplicatonPriority(),
               appAddedEvent.getPlacementContext());
@@ -2151,7 +2145,6 @@ public class CapacityScheduler extends
     return planQueueName + ReservationConstants.DEFAULT_QUEUE_SUFFIX;
   }
 
-  // 解析出保留资源的队列名称
   private String resolveReservationQueueName(String queueName,
       ApplicationId applicationId, ReservationId reservationID,
       boolean isRecovering) {
@@ -2672,7 +2665,7 @@ public class CapacityScheduler extends
     if (null == request) {
       return;
     }
-    // 异步提交资源
+
     if (scheduleAsynchronously) {
       // Submit to a commit thread and commit it async-ly
       resourceCommitterService.addNewCommitRequest(request);
@@ -2765,7 +2758,6 @@ public class CapacityScheduler extends
     return null;
   }
 
-  // 创建ReourceCommitRequest请求
   @VisibleForTesting
   public ResourceCommitRequest<FiCaSchedulerApp, FiCaSchedulerNode>
       createResourceCommitRequest(CSAssignment csAssignment) {
@@ -2857,7 +2849,7 @@ public class CapacityScheduler extends
 
     return null;
   }
-  // 提交资源
+
   @Override
   public boolean tryCommit(Resource cluster, ResourceCommitRequest r,
       boolean updatePending) {
@@ -2874,7 +2866,6 @@ public class CapacityScheduler extends
             .getContainersToAllocate().isEmpty();
 
     // find the application to accept and apply the ResourceCommitRequest
-      // 找出请求资源的Application
     if (request.anythingAllocatedOrReserved()) {
       ContainerAllocationProposal<FiCaSchedulerApp, FiCaSchedulerNode> c =
           request.getFirstAllocatedOrReservedContainer();

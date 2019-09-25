@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * 决定子队列的优先级
  * This will be used by
  * {@link org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.ParentQueue}
  * to decide allocation ordering of child queues.

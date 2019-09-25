@@ -56,6 +56,7 @@ import org.apache.hadoop.yarn.server.resourcemanager.scheduler.placement.SingleC
 import org.apache.hadoop.yarn.server.scheduler.SchedulerRequestKey;
 import org.apache.hadoop.yarn.util.resource.Resources;
 /**
+ * Application与调度相关的信息
  * This class keeps track of all the consumption of an application. This also
  * keeps track of current running/completed containers for the application.
  */

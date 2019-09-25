@@ -261,10 +261,12 @@ public class RMAppImpl implements RMApp, Recoverable {
      // Transitions from SUBMITTED state
     .addTransition(RMAppState.SUBMITTED, RMAppState.SUBMITTED,
         RMAppEventType.NODE_UPDATE, new RMAppNodeUpdateTransition())
+          // 被调度器拒绝这个任务
     .addTransition(RMAppState.SUBMITTED, RMAppState.FINAL_SAVING,
         RMAppEventType.APP_REJECTED,
         new FinalSavingTransition(
           new AppRejectedTransition(), RMAppState.FAILED))
+          // 被调度器接受
     .addTransition(RMAppState.SUBMITTED, RMAppState.ACCEPTED,
         RMAppEventType.APP_ACCEPTED, new StartAppAttemptTransition())
     .addTransition(RMAppState.SUBMITTED, RMAppState.FINAL_SAVING,
@@ -1004,7 +1006,9 @@ public class RMAppImpl implements RMApp, Recoverable {
 
   private void
       createAndStartNewAttempt(boolean transferStateFromPreviousAttempt) {
+    // 创建ApplicationAttemp尝试运行一次
     createNewAttempt();
+    // 产生RMAppStartAttemptEvent,放入中央调度器等待处理
     handler.handle(new RMAppStartAttemptEvent(currentAttempt.getAppAttemptId(),
       transferStateFromPreviousAttempt));
   }

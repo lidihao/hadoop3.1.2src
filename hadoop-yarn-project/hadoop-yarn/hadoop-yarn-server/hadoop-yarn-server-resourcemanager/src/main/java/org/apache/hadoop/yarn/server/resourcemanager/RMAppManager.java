@@ -380,6 +380,7 @@ public class RMAppManager implements EventHandler<RMAppManagerEvent>,
     }
 
     ApplicationId applicationId = submissionContext.getApplicationId();
+    // 所需资源
     List<ResourceRequest> amReqs = validateAndCreateResourceRequest(
         submissionContext, isRecovery);
 

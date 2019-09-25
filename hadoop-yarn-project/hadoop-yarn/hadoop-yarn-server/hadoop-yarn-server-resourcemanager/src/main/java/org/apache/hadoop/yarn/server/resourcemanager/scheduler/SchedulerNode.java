@@ -51,6 +51,7 @@ import com.google.common.collect.ImmutableSet;
 
 
 /**
+ * 代表一个调度节点
  * Represents a YARN Cluster Node from the viewpoint of the scheduler.
  */
 @Private
@@ -58,11 +59,15 @@ import com.google.common.collect.ImmutableSet;
 public abstract class SchedulerNode {
 
   private static final Log LOG = LogFactory.getLog(SchedulerNode.class);
-
+  // 未已经分配的资源
   private Resource unallocatedResource = Resource.newInstance(0, 0);
+  // 已经分配的资源
   private Resource allocatedResource = Resource.newInstance(0, 0);
+  // 总资源
   private Resource totalResource;
+  // 预定的资源
   private RMContainer reservedContainer;
+
   private volatile int numContainers;
   private volatile ResourceUtilization containersUtilization =
       ResourceUtilization.newInstance(0, 0, 0f);

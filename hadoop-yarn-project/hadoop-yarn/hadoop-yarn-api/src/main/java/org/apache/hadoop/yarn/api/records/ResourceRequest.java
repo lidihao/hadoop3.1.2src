@@ -349,6 +349,7 @@ public abstract class ResourceRequest implements Comparable<ResourceRequest> {
   public abstract String getResourceName();
 
   /**
+   *
    * Set the resource name (e.g. <em>host/rack</em>) on which the allocation 
    * is desired.
    * 
@@ -443,6 +444,7 @@ public abstract class ResourceRequest implements Comparable<ResourceRequest> {
   public abstract void setRelaxLocality(boolean relaxLocality);
   
   /**
+   * 指定分配到某些特定的节点
    * Get node-label-expression for this Resource Request. If this is set, all
    * containers allocated to satisfy this resource-request will be only on those
    * nodes that satisfy this node-label-expression.

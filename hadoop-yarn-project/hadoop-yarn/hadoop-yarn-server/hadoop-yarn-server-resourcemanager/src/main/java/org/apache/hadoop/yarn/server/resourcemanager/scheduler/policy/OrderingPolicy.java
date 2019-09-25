@@ -23,6 +23,7 @@ import org.apache.hadoop.yarn.server.resourcemanager.rmcontainer.RMContainer;
 
 
 /**
+ * 决定调度实体的调度顺序
  * OrderingPolicy is used by the scheduler to order SchedulableEntities for
  * container assignment and preemption.
  * @param <S> the type of {@link SchedulableEntity} that will be compared

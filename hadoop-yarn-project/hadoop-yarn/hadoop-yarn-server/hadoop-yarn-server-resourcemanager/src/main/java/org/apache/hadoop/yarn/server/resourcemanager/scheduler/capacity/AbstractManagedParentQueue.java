@@ -34,6 +34,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
+ * 可以自动地创建子队列
  * A container class for automatically created child leaf queues.
  * From the user perspective this is equivalent to a LeafQueue,
  * but functionality wise is a sub-class of ParentQueue

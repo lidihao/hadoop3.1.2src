@@ -742,7 +742,7 @@ public class ResourceManager extends CompositeService
       // Register event handler for RmAppEvents
       rmDispatcher.register(RMAppEventType.class,
           new ApplicationEventDispatcher(rmContext));
-
+      //处理RmAppAttempEvents事件
       // Register event handler for RmAppAttemptEvents
       rmDispatcher.register(RMAppAttemptEventType.class,
           new ApplicationAttemptEventDispatcher(rmContext));
@@ -1043,6 +1043,7 @@ public class ResourceManager extends CompositeService
         RMAppAttempt rmAppAttempt = rmApp.getRMAppAttempt(appAttemptId);
         if (rmAppAttempt != null) {
           try {
+            // RMAppAttempt状态机
             rmAppAttempt.handle(event);
           } catch (Throwable t) {
             LOG.error("Error in handling event type " + event.getType()

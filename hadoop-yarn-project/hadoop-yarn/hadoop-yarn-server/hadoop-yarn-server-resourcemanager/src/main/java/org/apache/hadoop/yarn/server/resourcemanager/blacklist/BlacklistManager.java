@@ -22,6 +22,7 @@ import org.apache.hadoop.classification.InterfaceAudience.Private;
 import org.apache.hadoop.yarn.api.records.ResourceBlacklistRequest;
 
 /**
+ * 资源分配黑名单
  * Tracks blacklists based on failures reported on nodes.
  */
 @Private

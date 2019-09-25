@@ -627,6 +627,7 @@ public class LeafQueue extends AbstractCSQueue {
     try {
       writeLock.lock();
       // Check if the queue is accepting jobs
+      // 是否处于关闭状态
       if (getState() != QueueState.RUNNING) {
         String msg = "Queue " + getQueuePath()
             + " is STOPPED. Cannot accept submission of application: "
@@ -634,7 +635,7 @@ public class LeafQueue extends AbstractCSQueue {
         LOG.info(msg);
         throw new AccessControlException(msg);
       }
-
+      // 是否超过队列的应用个数限制
       // Check submission limits for queues
       if (getNumApplications() >= getMaxApplications()) {
         String msg =
@@ -644,7 +645,7 @@ public class LeafQueue extends AbstractCSQueue {
         LOG.info(msg);
         throw new AccessControlException(msg);
       }
-
+      // 每个用户的应用数限制
       // Check submission limits for the user on this queue
       User user = usersManager.getUserAndAddIfAbsent(userName);
       if (user.getTotalApplications() >= getMaxApplicationsPerUser()) {
@@ -659,6 +660,7 @@ public class LeafQueue extends AbstractCSQueue {
     }
 
     try {
+      // 递归检查
       getParent().validateSubmitApplication(applicationId, userName, queue);
     } catch (AccessControlException ace) {
       LOG.info("Failed to submit application to parent-queue: " + 
@@ -1070,10 +1072,11 @@ public class LeafQueue extends AbstractCSQueue {
       LOG.debug("assignContainers: partition=" + candidates.getPartition()
           + " #applications=" + orderingPolicy.getNumSchedulableEntities());
     }
-
+    // 允许资源抢占??
     setPreemptionAllowed(currentResourceLimits, candidates.getPartition());
 
     // Check for reserved resources, try to allocate reserved container first.
+    // 分配预定资源
     CSAssignment assignment = allocateFromReservedContainer(clusterResource,
         candidates, currentResourceLimits, schedulingMode);
     if (null != assignment) {
@@ -1117,6 +1120,7 @@ public class LeafQueue extends AbstractCSQueue {
           node.getNodeID(), SystemClock.getInstance().getTime(), application);
 
       // Check queue max-capacity limit
+      // 检查队列容量限制
       Resource appReserved = application.getCurrentReservation();
       if (needAssignToQueueCheck) {
         if (!super.canAssignToThisQueue(clusterResource, node.getPartition(),
@@ -1150,6 +1154,7 @@ public class LeafQueue extends AbstractCSQueue {
         userLimits.put(application.getUser(), cul);
       }
       // Check user limit
+      // 检查用户资源限制
       boolean userAssignable = true;
       if (!cul.canAssign && Resources.fitsIn(appReserved, cul.reservation)) {
         userAssignable = false;

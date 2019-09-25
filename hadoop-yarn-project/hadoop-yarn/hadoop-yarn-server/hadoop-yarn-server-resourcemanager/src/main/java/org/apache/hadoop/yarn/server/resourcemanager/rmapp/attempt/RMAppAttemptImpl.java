@@ -145,7 +145,9 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
 
   private final RMContext rmContext;
   private final EventHandler eventHandler;
+  // 调度器
   private final YarnScheduler scheduler;
+  // 与ApplicationMaster进行通信
   private final ApplicationMasterService masterService;
   private final RMApp rmApp;
 
@@ -214,6 +216,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
                                      RMAppAttemptEvent>(RMAppAttemptState.NEW)
 
        // Transitions from NEW State
+          // NEW->START
       .addTransition(RMAppAttemptState.NEW, RMAppAttemptState.SUBMITTED,
           RMAppAttemptEventType.START, new AttemptStartedTransition())
       .addTransition(RMAppAttemptState.NEW, RMAppAttemptState.FINAL_SAVING,
@@ -1089,6 +1092,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
     public RMAppAttemptState transition(RMAppAttemptImpl appAttempt,
         RMAppAttemptEvent event) {
       ApplicationSubmissionContext subCtx = appAttempt.submissionContext;
+      //由RM启动ApplicationMaster
       if (!subCtx.getUnmanagedAM()) {
         // Need reset #containers before create new attempt, because this request
         // will be passed to scheduler, and scheduler will deduct the number after
@@ -1119,6 +1123,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
         }
 
         QueueInfo queueInfo = null;
+        // 设置资源请求的Label
         for (ResourceRequest amReq : appAttempt.amReqs) {
           if (amReq.getNodeLabelExpression() == null && ResourceRequest.ANY
               .equals(amReq.getResourceName())) {
@@ -1161,6 +1166,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
         }
 
         // AM resource has been checked when submission
+        // 进行调度
         Allocation amContainerAllocation =
             appAttempt.scheduler.allocate(
                 appAttempt.applicationAttemptId,

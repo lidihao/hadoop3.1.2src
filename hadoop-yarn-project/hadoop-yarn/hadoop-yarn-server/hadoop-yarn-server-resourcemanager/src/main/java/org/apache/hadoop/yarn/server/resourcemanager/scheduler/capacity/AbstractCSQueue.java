@@ -75,19 +75,27 @@ import com.google.common.collect.Sets;
 
 public abstract class AbstractCSQueue implements CSQueue {
 
-  private static final Log LOG = LogFactory.getLog(AbstractCSQueue.class);  
+  private static final Log LOG = LogFactory.getLog(AbstractCSQueue.class);
+  //父节点
   volatile CSQueue parent;
+  //队列名
   final String queueName;
+  //队列路径
   private final String queuePath;
+  //Container个数
   volatile int numContainers;
-
+  //最小资源
   final Resource minimumAllocation;
+  //最大资源
   volatile Resource maximumAllocation;
+  //队列状态
   private volatile QueueState state = null;
   final CSQueueMetrics metrics;
+  // 受权限保护的实体，队列或者资源
   protected final PrivilegedEntity queueEntity;
-
+  // 资源的比较和计算操作集合
   final ResourceCalculator resourceCalculator;
+  // 可以访问的节点的表达式
   Set<String> accessibleLabels;
   Set<String> resourceTypes;
   final RMNodeLabelsManager labelManager;

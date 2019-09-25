@@ -79,15 +79,17 @@ import org.apache.hadoop.yarn.util.resource.Resources;
 public class ParentQueue extends AbstractCSQueue {
 
   private static final Log LOG = LogFactory.getLog(ParentQueue.class);
-
+  // 子队列
   protected final List<CSQueue> childQueues;
+  // 是不是根队列
   private final boolean rootQueue;
+  // 应用的个数
   private volatile int numApplications;
   private final CapacitySchedulerContext scheduler;
 
   private final RecordFactory recordFactory = 
     RecordFactoryProvider.getRecordFactory(null);
-
+  // 决定为队列分配资源的顺序,实现优先级的逻辑
   private QueueOrderingPolicy queueOrderingPolicy;
 
   private long lastSkipQueueDebugLoggingTimestamp = -1;
@@ -532,12 +534,13 @@ public class ParentQueue extends AbstractCSQueue {
   }
 
   @Override
-  public CSAssignment assignContainers(Resource clusterResource,
+  public CSAssignment assignContainers(Resource clusterResource,//集群所有资源
       CandidateNodeSet<FiCaSchedulerNode> candidates,
       ResourceLimits resourceLimits, SchedulingMode schedulingMode) {
     FiCaSchedulerNode node = CandidateNodeSetUtils.getSingleNode(candidates);
 
     // if our queue cannot access this node, just return
+    // 队列不能使用这个node的 资源
     if (schedulingMode == SchedulingMode.RESPECT_PARTITION_EXCLUSIVITY
         && !accessibleToPartition(candidates.getPartition())) {
       if (LOG.isDebugEnabled()) {
@@ -565,6 +568,7 @@ public class ParentQueue extends AbstractCSQueue {
 
     // Check if this queue need more resource, simply skip allocation if this
     // queue doesn't need more resources.
+    //  不需要更多的资源
     if (!super.hasPendingResourceRequest(candidates.getPartition(),
         clusterResource, schedulingMode)) {
       if (LOG.isDebugEnabled()) {
@@ -592,7 +596,7 @@ public class ParentQueue extends AbstractCSQueue {
 
     CSAssignment assignment = new CSAssignment(Resources.createResource(0, 0),
         NodeType.NODE_LOCAL);
-
+    // 没有被Rerverse并且资源大于0
     while (canAssign(clusterResource, node)) {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Trying to assign containers to child-queue of "
@@ -602,6 +606,7 @@ public class ParentQueue extends AbstractCSQueue {
       // Are we over maximum-capacity for this queue?
       // This will also consider parent's limits and also continuous reservation
       // looking
+      // 是否超出队列资源的限制
       if (!super.canAssignToThisQueue(clusterResource,
           candidates.getPartition(),
           resourceLimits, Resources
@@ -620,6 +625,7 @@ public class ParentQueue extends AbstractCSQueue {
       }
 
       // Schedule
+      // 分配子队列
       CSAssignment assignedToChild = assignContainersToChildQueues(
           clusterResource, candidates, resourceLimits, schedulingMode);
       assignment.setType(assignedToChild.getType());
