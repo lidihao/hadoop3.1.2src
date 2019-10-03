@@ -355,7 +355,7 @@ public abstract class AbstractYarnScheduler
             new RMNodeCleanContainerEvent(node.getNodeID(), containerId));
         return;
       }
-
+      // 告诉RMContainer,container在节点上成功启动
       application.containerLaunchedOnNode(containerId, node.getNodeID());
       node.containerStarted(containerId);
     } finally {
@@ -481,7 +481,7 @@ public abstract class AbstractYarnScheduler
           container.getContainerId()));
     }
   }
-
+  // 回复Container和App的状态
   public void recoverContainersOnNode(List<NMContainerStatus> containerReports,
       RMNode nm) {
     try {
@@ -671,7 +671,7 @@ public abstract class AbstractYarnScheduler
           + ", but corresponding RMContainer doesn't exist.");
       return;
     }
-
+  // 如果执行类型为ExecutionType.GUARANTEED,确保第一时间执行
     if (rmContainer.getExecutionType() == ExecutionType.GUARANTEED) {
       completedContainerInternal(rmContainer, containerStatus, event);
       completeOustandingUpdatesWhichAreReserved(
@@ -995,6 +995,7 @@ public abstract class AbstractYarnScheduler
    */
   private List<ContainerStatus> updateNewContainerInfo(RMNode nm,
       SchedulerNode schedulerNode) {
+    // 处理堆积的Node更新信息
     List<UpdatedContainerInfo> containerInfoList = nm.pullContainerUpdates();
     List<ContainerStatus> newlyLaunchedContainers =
         new ArrayList<>();
@@ -1008,6 +1009,7 @@ public abstract class AbstractYarnScheduler
     }
 
     // Processing the newly launched containers
+    // 处理已经新Launched的container
     for (ContainerStatus launchedContainer : newlyLaunchedContainers) {
       containerLaunchedOnNode(launchedContainer.getContainerId(),
           schedulerNode);
@@ -1024,6 +1026,7 @@ public abstract class AbstractYarnScheduler
   }
 
   /**
+   * 释放已经完成的Container的资源
    * Process completed container list.
    * @param completedContainers Extracted list of completed containers
    * @param releasedResources Reference resource object for completed containers
@@ -1112,7 +1115,7 @@ public abstract class AbstractYarnScheduler
     // NOTICE: it is possible to not find the NodeID as a node can be
     // decommissioned at the same time. Skip updates if node is null.
     SchedulerNode schedulerNode = getNode(nm.getNodeID());
-    // 启动新的容器
+    // 启动新的容器,更新Container的信息
     List<ContainerStatus> completedContainers = updateNewContainerInfo(nm,
         schedulerNode);
 
@@ -1124,6 +1127,7 @@ public abstract class AbstractYarnScheduler
     // Process completed containers
     // 处理完成的containers
     Resource releasedResources = Resource.newInstance(0, 0);
+    // 释放已经完成的Container的资源
     int releasedContainers = updateCompletedContainers(completedContainers,
         releasedResources, nm.getNodeID(), schedulerNode);
 

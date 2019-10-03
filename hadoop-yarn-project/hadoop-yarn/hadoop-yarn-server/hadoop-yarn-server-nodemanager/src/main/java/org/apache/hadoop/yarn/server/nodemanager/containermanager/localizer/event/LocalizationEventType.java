@@ -16,7 +16,7 @@
 * limitations under the License.
 */
 package org.apache.hadoop.yarn.server.nodemanager.containermanager.localizer.event;
-
+// 由ResourceLocalizationService处理
 public enum LocalizationEventType {
   INIT_APPLICATION_RESOURCES,
   LOCALIZE_CONTAINER_RESOURCES,

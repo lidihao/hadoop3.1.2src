@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 /**
+ * 通过周期性地运行一个自定义脚本(由NodeHealthScriptRunner完成)和向磁盘写文件(由LocalDirsHandleService)检查
+ * 节点的健康状况，并将之通过NodeStatusUpdater传递给RM.
  * The class which provides functionality of checking the health of the node and
  * reporting back to the service for which the health checker has been asked to
  * report.

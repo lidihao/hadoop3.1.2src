@@ -70,7 +70,8 @@ import static org.apache.hadoop.yarn.server.nodemanager.containermanager.launche
 import static org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.CONTAINER_PRE_LAUNCH_STDOUT;
 
 /**
- *
+ *ContainerExecutor可与底层操作系统进行交互，安全存放Container需要的文件和目录，
+ * 进而以一种安全的方式启动和清除Container
  * This class is abstraction of the mechanism used to launch a container on the
  * underlying OS.  All executor implementations must extend ContainerExecutor.
  */

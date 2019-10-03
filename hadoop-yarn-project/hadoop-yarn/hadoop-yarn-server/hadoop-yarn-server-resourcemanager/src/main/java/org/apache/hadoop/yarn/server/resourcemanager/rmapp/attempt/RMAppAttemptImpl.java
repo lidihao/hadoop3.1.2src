@@ -217,6 +217,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
 
        // Transitions from NEW State
           // NEW->START
+          //由RMApp触发
       .addTransition(RMAppAttemptState.NEW, RMAppAttemptState.SUBMITTED,
           RMAppAttemptEventType.START, new AttemptStartedTransition())
       .addTransition(RMAppAttemptState.NEW, RMAppAttemptState.FINAL_SAVING,
@@ -279,6 +280,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
 
        // Transitions from ALLOCATED_SAVING State
           //RMStateStore发起这个事件，保存好了状态
+          //启动AM
       .addTransition(RMAppAttemptState.ALLOCATED_SAVING, 
           RMAppAttemptState.ALLOCATED,
           RMAppAttemptEventType.ATTEMPT_NEW_SAVED, new AttemptStoredTransition())
@@ -325,6 +327,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
               RMAppAttemptState.FAILED))
 
        // Transitions from ALLOCATED State
+          // AM已经启动
       .addTransition(RMAppAttemptState.ALLOCATED, RMAppAttemptState.LAUNCHED,
           RMAppAttemptEventType.LAUNCHED, LAUNCHED_TRANSITION)
       .addTransition(RMAppAttemptState.ALLOCATED, RMAppAttemptState.FINAL_SAVING,
@@ -340,7 +343,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
           RMAppAttemptEventType.FAIL,
           new FinalSavingTransition(FAILED_TRANSITION,
               RMAppAttemptState.FAILED))
-      .addTransition(RMAppAttemptState.ALLOCATED, RMAppAttemptState.RUNNING,
+      .addTransition(RMAppAttemptState.ALLOCATED , RMAppAttemptState.RUNNING,
           RMAppAttemptEventType.REGISTERED, REGISTERED_TRANSITION)
       .addTransition(RMAppAttemptState.ALLOCATED, RMAppAttemptState.FINAL_SAVING,
           RMAppAttemptEventType.CONTAINER_FINISHED,
@@ -348,6 +351,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
             new AMContainerCrashedBeforeRunningTransition(), RMAppAttemptState.FAILED))
 
        // Transitions from LAUNCHED State
+          // LAUNCHED => RUNNING,有ApplicationMasterProtocol触发
       .addTransition(RMAppAttemptState.LAUNCHED, RMAppAttemptState.RUNNING,
           RMAppAttemptEventType.REGISTERED, REGISTERED_TRANSITION)
       .addTransition(RMAppAttemptState.LAUNCHED,
@@ -389,6 +393,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
           new ContainerFinishedTransition(
             new AMContainerCrashedAtRunningTransition(),
             RMAppAttemptState.RUNNING))
+          // ApplicationMaster超时,由AMLivelinessMonitor触发
       .addTransition(
           RMAppAttemptState.RUNNING, RMAppAttemptState.FINAL_SAVING,
           RMAppAttemptEventType.EXPIRE,
@@ -405,6 +410,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
             RMAppAttemptState.FAILED))
 
        // Transitions from FINAL_SAVING State
+          // 保存了状态
       .addTransition(RMAppAttemptState.FINAL_SAVING,
           EnumSet.of(RMAppAttemptState.FINISHING, RMAppAttemptState.FAILED,
             RMAppAttemptState.KILLED, RMAppAttemptState.FINISHED),
@@ -1062,6 +1068,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
       appAttempt.startTime = System.currentTimeMillis();
 
       // Register with the ApplicationMasterService
+      // 调用NMTokenSecretManager设置各种Token
       appAttempt.masterService
           .registerAppAttempt(appAttempt.applicationAttemptId);
 
@@ -1073,6 +1080,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
 
       // Add the applicationAttempt to the scheduler and inform the scheduler
       // whether to transfer the state from previous attempt.
+      // 触发SchedulerEvent(AppAttempt_Add)事件
       appAttempt.eventHandler.handle(new AppAttemptAddedSchedulerEvent(
         appAttempt.applicationAttemptId, transferStateFromPreviousAttempt));
     }
@@ -1194,6 +1202,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
     public RMAppAttemptState transition(RMAppAttemptImpl appAttempt,
         RMAppAttemptEvent event) {
       // Acquire the AM container from the scheduler.
+      // 获取AM container 将RMContainerImp的状态设置为ACQUIRED
       Allocation amContainerAllocation =
           appAttempt.scheduler.allocate(appAttempt.applicationAttemptId,
             EMPTY_CONTAINER_REQUEST_LIST, null, EMPTY_CONTAINER_RELEASE_LIST, null,
@@ -1520,6 +1529,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
               keepContainersAcrossAppAttempts = true;
             }
           }
+          // 向RMApp发送ATTEMPT_FAILED事件
           appEvent =
               new RMAppFailedAttemptEvent(applicationId,
                 RMAppEventType.ATTEMPT_FAILED, appAttempt.getDiagnostics(),
@@ -1688,6 +1698,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
       appAttempt.updateAMLaunchDiagnostics(null);
 
       // Let the app know
+      // 让App知道,ApplicationMaster已经启动
       appAttempt.eventHandler.handle(new RMAppEvent(appAttempt
           .getAppAttemptId().getApplicationId(),
           RMAppEventType.ATTEMPT_REGISTERED));
@@ -1768,6 +1779,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
       appAttempt.progress = 1.0f;
 
       // Tell the app and the scheduler
+      // 告诉app和scheduler这个任务已经失败
       super.transition(appAttempt, event);
 
       // UnRegister from AMLivelinessMonitor. Perhaps for
@@ -1779,6 +1791,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
 
       if(!appAttempt.submissionContext.getUnmanagedAM()) {
         // Tell the launcher to cleanup.
+        // 如果说由yarn启动的AM，则需要清理
         appAttempt.eventHandler.handle(new AMLauncherEvent(
             AMLauncherEventType.CLEANUP, appAttempt));
       }
@@ -1786,7 +1799,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
   }
 
   private static class ExpiredTransition extends FinalTransition {
-
+    // 失败
     public ExpiredTransition() {
       super(RMAppAttemptState.FAILED);
     }
@@ -2213,7 +2226,7 @@ public class RMAppAttemptImpl implements RMAppAttempt, Recoverable {
     return RMServerUtils.createApplicationAttemptState(state);
   }
   //启动AM
-  private void launchAttempt(){
+  private void  launchAttempt(){
     launchAMStartTime = System.currentTimeMillis();
     // Send event to launch the AM Container
     eventHandler.handle(new AMLauncherEvent(AMLauncherEventType.LAUNCH, this));

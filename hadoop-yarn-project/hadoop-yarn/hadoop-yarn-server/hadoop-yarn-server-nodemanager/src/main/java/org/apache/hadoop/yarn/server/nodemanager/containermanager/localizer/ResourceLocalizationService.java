@@ -146,7 +146,13 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+//负责Container所需资源的本地化，它能够按照描述从HDFS上下载Container所需的文件资源，
+// 并尽量将他们分摊到各个磁盘上防止出现访问热点，此外，它会为下载的文件添加访问控制限制
+// 并为之施加合适的磁盘空间使用份额
 
+// ResourceLocalizationService内部启动一个(实现了LocalizationProtocol协议)RPC服务器
+// 而ContainerExecutor则启动一个资源下载客户端ContainerLocalizer,它不断地从服务端获取待
+// 下载资源列表,然后下载到被设置了特定权限的目录中
 public class ResourceLocalizationService extends CompositeService
     implements EventHandler<LocalizationEvent>, LocalizationProtocol {
 
@@ -282,6 +288,7 @@ public class ResourceLocalizationService extends CompositeService
 
     localizerTracker = createLocalizerTracker(conf);
     addService(localizerTracker);
+    // 处理LocalizerEventType
     dispatcher.register(LocalizerEventType.class, localizerTracker);
     localDirsChangeListener = new DirsChangeListener() {
       @Override
@@ -439,6 +446,7 @@ public class ResourceLocalizationService extends CompositeService
   public void handle(LocalizationEvent event) {
     // TODO: create log dir as $logdir/$user/$appId
     switch (event.getType()) {
+      // Application创建第一个Container时触发
     case INIT_APPLICATION_RESOURCES:
       handleInitApplicationResources(
           ((ApplicationLocalizationEvent)event).getApplication());
@@ -472,6 +480,7 @@ public class ResourceLocalizationService extends CompositeService
   private void handleInitApplicationResources(Application app) {
     // 0) Create application tracking structs
     String userName = app.getUser();
+    // 创建LocalResourcesTrackerImpl
     privateRsrc.putIfAbsent(userName, new LocalResourcesTrackerImpl(userName,
         null, dispatcher, true, super.getConfig(), stateStore, dirsHandler));
     String appIdStr = app.getAppId().toString();
@@ -509,6 +518,8 @@ public class ResourceLocalizationService extends CompositeService
         c.getUser(), c.getContainerId(), c.getCredentials(), statCache);
     Map<LocalResourceVisibility, Collection<LocalResourceRequest>> rsrcs =
       rsrcReqs.getRequestedResources();
+    // ResourceLocalizationService收到INIT_CONTAINER_RESOURCES事件后，依次将该Container所
+    // 需的每个资源单独封装成一个REQUEST事件，发送给对应的资源状态追踪器LocalResourceTrackerImpl
     for (Map.Entry<LocalResourceVisibility, Collection<LocalResourceRequest>> e :
          rsrcs.entrySet()) {
       LocalResourcesTracker tracker =
@@ -723,6 +734,7 @@ public class ResourceLocalizationService extends CompositeService
   }
   
   /**
+   * 处理LocalizerEvent事件
    * Sub-component handling the spawning of {@link ContainerLocalizer}s
    */
   class LocalizerTracker extends AbstractService implements EventHandler<LocalizerEvent>  {
@@ -846,7 +858,7 @@ public class ResourceLocalizationService extends CompositeService
     return HadoopExecutors.newFixedThreadPool(nThreads, tf);
   }
 
-
+  // 下载Public资源
   class PublicLocalizer extends Thread {
 
     final FileContext lfs;
@@ -865,7 +877,7 @@ public class ResourceLocalizationService extends CompositeService
       this.threadPool = createLocalizerExecutor(conf);
       this.queue = new ExecutorCompletionService<Path>(threadPool);
     }
-
+    // 添加本地化资源
     public void addResource(LocalizerResourceRequestEvent request) {
       // TODO handle failures, cancellation, requests by other containers
       LocalizedResource rsrc = request.getResource();
@@ -908,6 +920,7 @@ public class ResourceLocalizationService extends CompositeService
             // explicitly synchronize pending here to avoid future task
             // completing and being dequeued before pending updated
             synchronized (pending) {
+              // 提交资源下载请求
               pending.put(queue.submit(new FSDownload(lfs, null, conf,
                   publicDirDestPath, resource, request.getContext().getStatCache())),
                   request);
@@ -980,6 +993,7 @@ public class ResourceLocalizationService extends CompositeService
               }
               Path local = completed.get();
               LocalResourceRequest key = assoc.getResource().getRequest();
+              // 处理下载完成的Resource
               publicRsrc.handle(new ResourceLocalizedEvent(key, local, FileUtil
                 .getDU(new File(local.toUri()))));
               assoc.getResource().unlock();
@@ -1244,6 +1258,7 @@ public class ResourceLocalizationService extends CompositeService
         // 1) write credentials to private dir
         writeCredentials(nmPrivateCTokensPath);
         // 2) exec initApplication and wait
+        //启动ContainerLocalizer进程取下载资源，？？为什么重新搞一个进程??
         if (dirsHandler.areDisksHealthy()) {
           exec.startLocalizer(new LocalizerStartContext.Builder()
               .setNmPrivateContainerTokens(nmPrivateCTokensPath)

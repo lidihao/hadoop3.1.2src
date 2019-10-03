@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
+ * 按照子队列的资源使用率占比(优先级)由小到大依次遍历各个子队列
  * For two queues with the same priority:
  * - The queue with less relative used-capacity goes first - today’s behavior.
  * - The default priority for all queues is 0 and equal. So, we get today’s
@@ -54,10 +55,12 @@ import java.util.function.Supplier;
 public class PriorityUtilizationQueueOrderingPolicy
     implements QueueOrderingPolicy {
   private List<CSQueue> queues;
+  // 是否关注Priority
   private boolean respectPriority;
 
   // This makes multiple threads can sort queues at the same time
   // For different partitions.
+  // node的标识Label
   private static ThreadLocal<String> partitionToLookAt =
       ThreadLocal.withInitial(new Supplier<String>() {
         @Override
@@ -177,12 +180,15 @@ public class PriorityUtilizationQueueOrderingPolicy
     private int compareQueueAccessToPartition(CSQueue q1, CSQueue q2,
         String partition) {
       // Everybody has access to default partition
+      // node的Label是NO_LABEL,意味者任何一个队列都可以访问
       if (StringUtils.equals(partition, RMNodeLabelsManager.NO_LABEL)) {
         return 0;
       }
 
       /*
-       * Check accessible to given partition, if one queue accessible and
+       *比较队列对节点的可访问性，如果一个队列对节点可访问，另一个队列不可以，则
+       * 这个队列排前
+       *  Check accessible to given partition, if one queue accessible and
        * the other not, accessible queue goes first.
        */
       boolean q1Accessible =

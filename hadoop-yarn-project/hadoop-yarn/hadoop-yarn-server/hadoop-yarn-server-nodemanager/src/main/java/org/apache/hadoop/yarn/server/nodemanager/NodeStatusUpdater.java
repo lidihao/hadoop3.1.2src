@@ -27,6 +27,7 @@ import org.apache.hadoop.yarn.api.records.ContainerId;
 public interface NodeStatusUpdater extends Service {
 
   /**
+   * 心跳信息
    * Schedule a heartbeat to the ResourceManager outside of the normal,
    * periodic heartbeating process. This is typically called when the state
    * of containers on the node has changed to notify the RM sooner.

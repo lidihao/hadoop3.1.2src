@@ -796,6 +796,7 @@ public class MapTask extends Task {
 
     try {
       input.initialize(split, mapperContext);
+      // 调用具体的方法
       mapper.run(mapperContext);
       mapPhase.complete();
       setPhase(TaskStatus.Phase.SORT);

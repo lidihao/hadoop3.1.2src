@@ -225,6 +225,13 @@ public class RMAppImpl implements RMApp, Recoverable {
 
 
      // Transitions from NEW state
+          // NODE_UPDATE事件,将更新的Node放到updatedNodes
+          /**
+           * NodeUpdateType
+           *   NODE_USABLE,
+           *   NODE_UNUSABLE,
+           *   NODE_DECOMMISSIONING
+           */
     .addTransition(RMAppState.NEW, RMAppState.NEW,
         RMAppEventType.NODE_UPDATE, new RMAppNodeUpdateTransition())
           //记录Application的信息
@@ -234,6 +241,7 @@ public class RMAppImpl implements RMApp, Recoverable {
             RMAppState.ACCEPTED, RMAppState.FINISHED, RMAppState.FAILED,
             RMAppState.KILLED, RMAppState.FINAL_SAVING),
         RMAppEventType.RECOVER, new RMAppRecoveredTransition())
+          // KILLED事件
     .addTransition(RMAppState.NEW, RMAppState.KILLED, RMAppEventType.KILL,
         new AppKilledTransition())
     .addTransition(RMAppState.NEW, RMAppState.FINAL_SAVING,
@@ -313,6 +321,7 @@ public class RMAppImpl implements RMApp, Recoverable {
     .addTransition(RMAppState.RUNNING, RMAppState.RUNNING, 
         RMAppEventType.APP_RUNNING_ON_NODE,
         new AppRunningOnNodeTransition())
+          // 任务失败,AM失联,可能转到的状态ACCEPT,FINAL_SAVING
     .addTransition(RMAppState.RUNNING,
         EnumSet.of(RMAppState.ACCEPTED, RMAppState.FINAL_SAVING),
         RMAppEventType.ATTEMPT_FAILED,
@@ -975,7 +984,7 @@ public class RMAppImpl implements RMApp, Recoverable {
       nextAttemptId = currentAttempt.getAppAttemptId().getAttemptId() + 1;
     }
   }
-
+  // 创建一个新的AppAttempt
   private void createNewAttempt() {
     ApplicationAttemptId appAttemptId =
         ApplicationAttemptId.newInstance(applicationId, nextAttemptId++);
@@ -1003,12 +1012,12 @@ public class RMAppImpl implements RMApp, Recoverable {
     attempts.put(appAttemptId, attempt);
     currentAttempt = attempt;
   }
-
+  // transferStateFromPreviousAttempt 是否继承上一次Attempt的属性
   private void
       createAndStartNewAttempt(boolean transferStateFromPreviousAttempt) {
     // 创建ApplicationAttemp尝试运行一次
     createNewAttempt();
-    // 产生RMAppStartAttemptEvent,放入中央调度器等待处理
+    // 产生RMAppStartAttemptEvent,放入中央调度器等待处理,RMAppStartAttemptEvent(START)
     handler.handle(new RMAppStartAttemptEvent(currentAttempt.getAppAttemptId(),
       transferStateFromPreviousAttempt));
   }
@@ -1156,6 +1165,7 @@ public class RMAppImpl implements RMApp, Recoverable {
       RMAppTransition {
     @Override
     public void transition(RMAppImpl app, RMAppEvent event) {
+      // 触发了调度事件，由ResourceScheduler进行调度
       app.handler.handle(
           new AppAddedSchedulerEvent(app.user, app.submissionContext, false,
               app.applicationPriority, app.placementContext));
@@ -1247,6 +1257,7 @@ public class RMAppImpl implements RMApp, Recoverable {
         // calculate next timeout value
         Long newTimeout =
             Long.valueOf(app.submitTime + (applicationLifetime * 1000));
+        // 将App注册到RMAppLifetimeMonitor,监控他是否超时
         app.rmContext.getRMAppLifetimeMonitor().registerApp(app.applicationId,
             ApplicationTimeoutType.LIFETIME, newTimeout);
 
@@ -1483,6 +1494,7 @@ public class RMAppImpl implements RMApp, Recoverable {
 
     public void transition(RMAppImpl app, RMAppEvent event) {
       app.logAggregationStartTime = System.currentTimeMillis();
+      // 触发RMNodeAppEvent.CLEANUP_APP事件
       for (NodeId nodeId : app.getRanNodes()) {
         app.handler.handle(
             new RMNodeCleanAppEvent(nodeId, app.applicationId));
@@ -1497,6 +1509,7 @@ public class RMAppImpl implements RMApp, Recoverable {
         app.handler.handle(new AppRemovedSchedulerEvent(app.applicationId,
           finalState));
       }
+      // 触发RMAppManagerEvent.APP_COMPLETED事件
       app.handler.handle(
           new RMAppManagerEvent(app.applicationId,
           RMAppManagerEventType.APP_COMPLETED));
@@ -1523,7 +1536,7 @@ public class RMAppImpl implements RMApp, Recoverable {
     }
     return completedAttempts;
   }
-
+  // 处理AM失联，RMAppAttempt失败
   private static final class AttemptFailedTransition implements
       MultipleArcTransition<RMAppImpl, RMAppEvent, RMAppState> {
 
@@ -1553,7 +1566,7 @@ public class RMAppImpl implements RMApp, Recoverable {
           removeExcessAttempts(app);
         }
       }
-
+      // AM是由yarn启动，并且重试此时小于最大重试次数
       if (!app.submissionContext.getUnmanagedAM()
           && numberOfFailure < app.maxAppAttempts) {
         if (initialState.equals(RMAppState.KILLING)) {
@@ -1570,6 +1583,7 @@ public class RMAppImpl implements RMApp, Recoverable {
             failedEvent.getTransferStateFromPreviousAttempt();
 
         RMAppAttempt oldAttempt = app.currentAttempt;
+        // 重新创建一个RMAppAttemptImpl
         app.createAndStartNewAttempt(transferStateFromPreviousAttempt);
         // Transfer the state from the previous attempt to the current attempt.
         // Note that the previous failed attempt may still be collecting the

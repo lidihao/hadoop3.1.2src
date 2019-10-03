@@ -150,6 +150,7 @@ public class RMNodeImpl implements RMNode, EventHandler<RMNodeEvent> {
       new HashSet<ContainerId>();
 
   /* set of containers that need to be cleaned */
+  // 需要清理的Containers，当NodeManager的心跳发生,会将Container的清理列表返回给NodeManager,NodeManager会清理资源
   private final Set<ContainerId> containersToClean = new TreeSet<ContainerId>(
       new ContainerIdComparator());
 
@@ -204,6 +205,8 @@ public class RMNodeImpl implements RMNode, EventHandler<RMNodeEvent> {
           new DeactivateNodeTransition(NodeState.DECOMMISSIONED))
 
       //Transitions from RUNNING state
+      // NodeManager会通过RPC函数ResourceTracker#nodeHeartbeat周期性向RM汇报心跳信息,而每次汇报心跳
+      // 均会触发一个STATUS_UPDATE事件
       .addTransition(NodeState.RUNNING,
           EnumSet.of(NodeState.RUNNING, NodeState.UNHEALTHY),
           RMNodeEventType.STATUS_UPDATE,
@@ -221,6 +224,7 @@ public class RMNodeImpl implements RMNode, EventHandler<RMNodeEvent> {
       .addTransition(NodeState.RUNNING, NodeState.REBOOTED,
           RMNodeEventType.REBOOTING,
           new DeactivateNodeTransition(NodeState.REBOOTED))
+          // 由RMAppImpl触发
       .addTransition(NodeState.RUNNING, NodeState.RUNNING,
           RMNodeEventType.CLEANUP_APP, new CleanUpAppTransition())
       .addTransition(NodeState.RUNNING, NodeState.RUNNING,
@@ -796,6 +800,7 @@ public class RMNodeImpl implements RMNode, EventHandler<RMNodeEvent> {
     }
 
     // Add running applications back due to Node add or Node reconnection.
+    // 告诉App他有Container在这个节点上运行
     rmNode.runningApplications.add(appId);
     context.getDispatcher().getEventHandler()
         .handle(new RMAppRunningOnNodeEvent(appId, nodeId));
@@ -844,6 +849,7 @@ public class RMNodeImpl implements RMNode, EventHandler<RMNodeEvent> {
           ClusterMetrics.getMetrics().decrDecommisionedNMs();
         }
         // Increment activeNodes explicitly because this is a new node.
+        // 有Container在运行
         ClusterMetrics.getMetrics().incrNumActiveNodes();
         containers = startEvent.getNMContainerStatuses();
         if (containers != null && !containers.isEmpty()) {
@@ -854,13 +860,13 @@ public class RMNodeImpl implements RMNode, EventHandler<RMNodeEvent> {
           }
         }
       }
-
+      // 有应用运行在这个节点上
       if (null != startEvent.getRunningApplications()) {
         for (ApplicationId appId : startEvent.getRunningApplications()) {
           handleRunningAppOnNode(rmNode, rmNode.context, appId, rmNode.nodeId);
         }
       }
-
+      // 触发SchedulerEvent.NODE_ADD
       rmNode.context.getDispatcher().getEventHandler()
         .handle(new NodeAddedSchedulerEvent(rmNode, containers));
       rmNode.context.getDispatcher().getEventHandler().handle(
@@ -1187,6 +1193,7 @@ public class RMNodeImpl implements RMNode, EventHandler<RMNodeEvent> {
   }
 
   /**
+   *
    * Status update transition when node is healthy.
    */
   public static class StatusUpdateWhenHealthyTransition implements
@@ -1210,7 +1217,7 @@ public class RMNodeImpl implements RMNode, EventHandler<RMNodeEvent> {
           return NodeState.DECOMMISSIONED;
         }
       }
-
+      // Node的状态处于Unhealth状态
       if (!remoteNodeHealthStatus.getIsNodeHealthy()) {
         LOG.info("Node " + rmNode.nodeId +
             " reported UNHEALTHY with details: " +
@@ -1238,6 +1245,7 @@ public class RMNodeImpl implements RMNode, EventHandler<RMNodeEvent> {
 
       if(rmNode.nextHeartBeat) {
         rmNode.nextHeartBeat = false;
+        // 发送SchedulerEvent.NODE_UPADATE事件到Scheduler
         rmNode.context.getDispatcher().getEventHandler().handle(
             new NodeUpdateSchedulerEvent(rmNode));
       }
@@ -1406,6 +1414,7 @@ public class RMNodeImpl implements RMNode, EventHandler<RMNodeEvent> {
           launchedContainers.add(containerId);
           newlyLaunchedContainers.add(remoteContainer);
           // Unregister from containerAllocationExpirer.
+          // 从ContainerAllocationExpirer中移除
           containerAllocationExpirer
               .unregister(new AllocationExpirationInfo(containerId));
         }
@@ -1429,7 +1438,7 @@ public class RMNodeImpl implements RMNode, EventHandler<RMNodeEvent> {
         newlyCompletedContainers.add(remoteContainer);
       }
     }
-
+    // 放入nodeUpdateQueue中，异步处理??
     if (newlyLaunchedContainers.size() != 0
         || newlyCompletedContainers.size() != 0) {
       nodeUpdateQueue.add(new UpdatedContainerInfo(newlyLaunchedContainers,

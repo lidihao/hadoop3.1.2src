@@ -771,6 +771,7 @@ public class FiCaSchedulerApp extends SchedulerApplicationAttempt {
   }
 
   /**
+   * //获取该App资源获取情况
    * This method produces an Allocation that includes the current view
    * of the resources that will be allocated to and preempted from this
    * application.

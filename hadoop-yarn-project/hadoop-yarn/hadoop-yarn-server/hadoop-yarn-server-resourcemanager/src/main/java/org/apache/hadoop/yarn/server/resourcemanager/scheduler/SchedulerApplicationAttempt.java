@@ -629,7 +629,7 @@ public class SchedulerApplicationAttempt implements SchedulableEntity {
   }
   
   @SuppressWarnings("unchecked")
-  // 在节点上启动Contain
+  // 告诉RMContainer,container在节点上成功启动
   public void containerLaunchedOnNode(ContainerId containerId,
       NodeId nodeId) {
     try {
@@ -673,7 +673,7 @@ public class SchedulerApplicationAttempt implements SchedulableEntity {
   public Resource getCurrentConsumption() {
     return attemptResourceUsage.getUsed();
   }
-  
+
   private Container updateContainerAndNMToken(RMContainer rmContainer,
       ContainerUpdateType updateType) {
     Container container = rmContainer.getContainer();
@@ -707,6 +707,7 @@ public class SchedulerApplicationAttempt implements SchedulableEntity {
 
     if (updateType == null) {
       // This is a newly allocated container
+      // 新分配的容器
       rmContainer.handle(new RMContainerEvent(
           rmContainer.getContainerId(), RMContainerEventType.ACQUIRED));
     } else {

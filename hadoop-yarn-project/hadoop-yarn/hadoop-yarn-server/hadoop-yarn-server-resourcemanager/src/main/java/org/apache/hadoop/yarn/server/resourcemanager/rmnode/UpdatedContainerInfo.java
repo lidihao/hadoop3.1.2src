@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.hadoop.yarn.api.records.ContainerStatus;
 
 public class UpdatedContainerInfo {
+
   private List<ContainerStatus> newlyLaunchedContainers;
   private List<ContainerStatus> completedContainers;
   

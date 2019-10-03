@@ -107,9 +107,10 @@ public class CSQueueUtils {
   public static void loadUpdateAndCheckCapacities(String queuePath,
       CapacitySchedulerConfiguration csConf,
       QueueCapacities queueCapacities, QueueCapacities parentQueueCapacities) {
+    // 从配置文件中加载capacity
     loadCapacitiesByLabelsFromConf(queuePath,
         queueCapacities, csConf);
-
+    // 更新绝对Capacity
     updateAbsoluteCapacitiesByNodeLabels(queueCapacities, parentQueueCapacities);
 
     capacitiesSanityCheck(queuePath, queueCapacities);
@@ -123,18 +124,28 @@ public class CSQueueUtils {
 
     for (String label : configuredNodelabels) {
       if (label.equals(CommonNodeLabelsManager.NO_LABEL)) {
+        // yarn.scheduler.capacity.<队列命>.capacity
+        // 队列的最小容量
         queueCapacities.setCapacity(label,
             csConf.getNonLabeledQueueCapacity(queuePath) / 100);
+        // yarn.scheduler.capacity.<队列命>.maximum-capacity
         queueCapacities.setMaximumCapacity(label,
             csConf.getNonLabeledQueueMaximumCapacity(queuePath) / 100);
+        // yarn.scheduler.capacity.<队列命>.accessible-node-labels.label.maximum-am-resource-percent
+        //如果label没有，则找yarn.scheduler.capacity.<队列命>.maximum-am-resource-percent
+        // 否则再找yarn.scheduler.capacity.maximum-am-resource-percent
+        // 用于运行AM的最大资源数
         queueCapacities.setMaxAMResourcePercentage(
             label,
             csConf.getMaximumAMResourcePercentPerPartition(queuePath, label));
       } else {
+        // yarn.scheduler.capacity.<队列命>.accessible-node-labels.label.capacity
         queueCapacities.setCapacity(label,
             csConf.getLabeledQueueCapacity(queuePath, label) / 100);
+        // yarn.scheduler.capacity.<队列命>.accessible-node-labels.label.maximum-capacity
         queueCapacities.setMaximumCapacity(label,
             csConf.getLabeledQueueMaximumCapacity(queuePath, label) / 100);
+        // yarn.scheduler.capacity.<队列命>.accessible-node-labels.label.maximum-am-resource-percent
         queueCapacities.setMaxAMResourcePercentage(label,
             csConf.getMaximumAMResourcePercentPerPartition(queuePath, label));
       }

@@ -1090,6 +1090,7 @@ public class ContainerManagerImpl extends CompositeService implements
         YarnServerSecurityUtils.parseCredentials(launchContext);
 
     long containerStartTime = SystemClock.getInstance().getTime();
+    // 创建一个Container
     Container container =
         new ContainerImpl(getConfig(), this.dispatcher,
             launchContext, credentials, metrics, containerTokenIdentifier,
@@ -1107,13 +1108,14 @@ public class ContainerManagerImpl extends CompositeService implements
     this.readLock.lock();
     try {
       if (!isServiceStopped()) {
+        // AM Container
         if (!context.getApplications().containsKey(applicationID)) {
           // Create the application
           // populate the flow context from the launch context if the timeline
           // service v.2 is enabled
           FlowContext flowContext =
               getFlowContext(launchContext, applicationID);
-
+          // 创建一个Application
           Application application =
               new ApplicationImpl(dispatcher, user, flowContext,
                   applicationID, credentials, context);
@@ -1128,6 +1130,7 @@ public class ContainerManagerImpl extends CompositeService implements
             context.getNMStateStore().storeApplication(applicationID,
                 buildAppProto(applicationID, user, credentials, appAcls,
                     logAggregationContext, flowContext));
+            // 产生INIT_APPLICATION事件
             dispatcher.getEventHandler().handle(new ApplicationInitEvent(
                 applicationID, appAcls, logAggregationContext));
           }
@@ -1160,6 +1163,7 @@ public class ContainerManagerImpl extends CompositeService implements
 
         this.context.getNMStateStore().storeContainer(containerId,
             containerTokenIdentifier.getVersion(), containerStartTime, request);
+        // 产生INIT_CONTAINER事件
         dispatcher.getEventHandler().handle(
           new ApplicationContainerInitEvent(container));
 

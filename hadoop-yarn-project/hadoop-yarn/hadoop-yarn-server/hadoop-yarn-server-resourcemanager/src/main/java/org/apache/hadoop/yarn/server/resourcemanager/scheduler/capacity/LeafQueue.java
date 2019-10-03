@@ -158,7 +158,7 @@ public class LeafQueue extends AbstractCSQueue {
       LOG.debug("LeafQueue:" + " name=" + queueName
           + ", fullname=" + getQueuePath());
     }
-
+    // 根据配置文件设置各种属性
     setupQueueConfigs(cs.getClusterResource(), configuration);
 
   }
@@ -174,6 +174,7 @@ public class LeafQueue extends AbstractCSQueue {
     try {
       writeLock.lock();
       CapacitySchedulerConfiguration schedConf = csContext.getConfiguration();
+      // 根据配置文件设置各种属性
       super.setupQueueConfigs(clusterResource, conf);
 
       this.lastClusterResource = clusterResource;
@@ -1176,6 +1177,7 @@ public class LeafQueue extends AbstractCSQueue {
       }
 
       // Try to schedule
+      // 应用内的调度
       assignment = application.assignContainers(clusterResource,
           candidates, currentResourceLimits, schedulingMode, null);
 

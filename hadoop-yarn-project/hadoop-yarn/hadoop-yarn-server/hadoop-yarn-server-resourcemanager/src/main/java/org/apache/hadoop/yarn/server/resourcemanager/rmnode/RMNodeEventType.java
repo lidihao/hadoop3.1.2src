@@ -31,6 +31,8 @@ public enum RMNodeEventType {
   RESOURCE_UPDATE,
 
   // ResourceTrackerService
+  // NodeManager会通过RPC函数ResourceTracker#nodeHeartbeat周期性向RM汇报心跳信息,而每次汇报心跳
+  // 均会触发一个STATUS_UPDATE事件
   STATUS_UPDATE,
   REBOOTING,
   RECONNECTED,
@@ -41,6 +43,7 @@ public enum RMNodeEventType {
 
   // Source: Container
   CONTAINER_ALLOCATED,
+  // 当一个Container执行完(可能成功或失败)，会触发这个事件，以清理Container占用的资源
   CLEANUP_CONTAINER,
   UPDATE_CONTAINER,
 

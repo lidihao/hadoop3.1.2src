@@ -312,23 +312,28 @@ public class ResourceTrackerService extends AbstractService implements
       rmContext.getDispatcher().getEventHandler().handle(evt);
     }
   }
-
+  // 新启动的NodeManager注册到ResourceManager
   @SuppressWarnings("unchecked")
   @Override
   public RegisterNodeManagerResponse registerNodeManager(
       RegisterNodeManagerRequest request) throws YarnException,
       IOException {
+    // nodeId
     NodeId nodeId = request.getNodeId();
+    // 主机名
     String host = nodeId.getHost();
+    // cmPort
     int cmPort = nodeId.getPort();
+    // httpPort
     int httpPort = request.getHttpPort();
+    // 资源量
     Resource capability = request.getResource();
     String nodeManagerVersion = request.getNMVersion();
     Resource physicalResource = request.getPhysicalResource();
 
     RegisterNodeManagerResponse response = recordFactory
         .newRecordInstance(RegisterNodeManagerResponse.class);
-
+    // 版本不匹配
     if (!minimumNodeManagerVersion.equals("NONE")) {
       if (minimumNodeManagerVersion.equals("EqualToRM")) {
         minimumNodeManagerVersion = YarnVersionInfo.getVersion();
@@ -349,6 +354,7 @@ public class ResourceTrackerService extends AbstractService implements
     }
 
     // Check if this node is a 'valid' node
+    // 管理黑名单和白名单
     if (!this.nodesListManager.isValidNode(host) &&
         !isNodeInDecommissioning(nodeId)) {
       String message =
@@ -398,6 +404,7 @@ public class ResourceTrackerService extends AbstractService implements
         resolve(host), capability, nodeManagerVersion, physicalResource);
 
     RMNode oldNode = this.rmContext.getRMNodes().putIfAbsent(nodeId, rmNode);
+    // 新的节点
     if (oldNode == null) {
       RMNodeStartedEvent startEvent = new RMNodeStartedEvent(nodeId,
           request.getNMContainerStatuses(),
@@ -412,9 +419,11 @@ public class ResourceTrackerService extends AbstractService implements
         startEvent.setLogAggregationReportsForApps(request
             .getLogAggregationReportsForApps());
       }
+      // 启动事件
       this.rmContext.getDispatcher().getEventHandler().handle(
           startEvent);
     } else {
+      // 重连
       LOG.info("Reconnect from the node at: " + host);
       this.nmLivelinessMonitor.unregister(nodeId);
 
@@ -441,7 +450,7 @@ public class ResourceTrackerService extends AbstractService implements
       } else {
         // Reset heartbeat ID since node just restarted.
         oldNode.resetLastNodeHeartBeatResponse();
-
+        // 重连事件
         this.rmContext.getDispatcher().getEventHandler()
             .handle(new RMNodeReconnectEvent(nodeId, rmNode,
                 request.getRunningApplications(),
@@ -451,6 +460,7 @@ public class ResourceTrackerService extends AbstractService implements
     // On every node manager register we will be clearing NMToken keys if
     // present for any running application.
     this.nmTokenSecretManager.removeNodeKey(nodeId);
+    // 心跳监听
     this.nmLivelinessMonitor.register(nodeId);
     
     // Handle received container status, this should be processed after new
@@ -605,7 +615,7 @@ public class ResourceTrackerService extends AbstractService implements
       setAppCollectorsMapToResponse(rmNode.getRunningApps(),
           nodeHeartBeatResponse);
     }
-
+    // RMNodeEvent.STATUS_UPDATE
     // 4. Send status to RMNode, saving the latest response.
     RMNodeStatusEvent nodeStatusEvent =
         new RMNodeStatusEvent(nodeId, remoteNodeStatus);

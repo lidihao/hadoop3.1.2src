@@ -841,6 +841,7 @@ public class CapacitySchedulerConfiguration extends ReservationSchedulerConfigur
 
   public String[] getQueues(String queue) {
     LOG.debug("CSConf - getQueues called for: queuePrefix=" + getQueuePrefix(queue));
+    // 由","分割
     String[] queues = getStrings(getQueuePrefix(queue) + QUEUES);
     List<String> trimmedQueueNames = new ArrayList<String>();
     if (null != queues) {
@@ -886,6 +887,7 @@ public class CapacitySchedulerConfiguration extends ReservationSchedulerConfigur
   }
 
   /**
+   * 每一个Container的最大分配量
    * Get the per queue setting for the maximum limit to allocate to
    * each container request.
    *

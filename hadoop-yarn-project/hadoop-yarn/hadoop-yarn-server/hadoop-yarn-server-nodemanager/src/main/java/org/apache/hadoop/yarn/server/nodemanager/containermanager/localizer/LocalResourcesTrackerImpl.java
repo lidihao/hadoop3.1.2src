@@ -139,6 +139,8 @@ class LocalResourcesTrackerImpl implements LocalResourcesTracker {
         inProgressLocalResourcesMap.remove(req);
       }
       break;
+      // 创建一个状态机对象LocalizedResource以跟踪资源的生命周期,并将
+      // REQUEST事件进一步传送给LocalizedResource
     case REQUEST:
       if (rsrc != null && (!isResourcePresent(rsrc))) {
         LOG.info("Resource " + rsrc.getLocalPath()
@@ -185,6 +187,7 @@ class LocalResourcesTrackerImpl implements LocalResourcesTracker {
           + " but localized resource is missing");
       return;
     }
+    // 再交由LocalizedResource处理
     rsrc.handle(event);
 
     // Remove the resource if its downloading and its reference count has

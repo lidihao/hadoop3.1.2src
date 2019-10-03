@@ -72,7 +72,7 @@ import org.apache.hadoop.yarn.util.resource.ResourceCalculator;
 import org.apache.hadoop.yarn.util.resource.Resources;
 
 import com.google.common.collect.Sets;
-
+// 主要初始化CSQueue的配置属性
 public abstract class AbstractCSQueue implements CSQueue {
 
   private static final Log LOG = LogFactory.getLog(AbstractCSQueue.class);
@@ -338,8 +338,10 @@ public abstract class AbstractCSQueue implements CSQueue {
     try {
       writeLock.lock();
       // get labels
+      // yarn.scheduler.capacity.<队列命>.accessible-node-labels
       this.accessibleLabels =
           configuration.getAccessibleNodeLabels(getQueuePath());
+      // yarn.scheduler.capacity.<队列命>.default-node-label-expression
       this.defaultLabelExpression =
           configuration.getDefaultNodeLabelExpression(
               getQueuePath());
@@ -349,11 +351,13 @@ public abstract class AbstractCSQueue implements CSQueue {
       }
 
       // inherit from parent if labels not set
+      // 如果label为空从parent上继承下来
       if (this.accessibleLabels == null && parent != null) {
         this.accessibleLabels = parent.getAccessibleNodeLabels();
       }
 
       // inherit from parent if labels not set
+      // 如果label为空从parent上继承下来
       if (this.defaultLabelExpression == null && parent != null
           && this.accessibleLabels.containsAll(
           parent.getAccessibleNodeLabels())) {
@@ -361,19 +365,23 @@ public abstract class AbstractCSQueue implements CSQueue {
       }
 
       // After we setup labels, we can setup capacities
+      // 设置队列的容量
       setupConfigurableCapacities(configuration);
 
       // Also fetch minimum/maximum resource constraint for this queue if
       // configured.
       capacityConfigType = CapacityConfigType.NONE;
+      // 可以显示配置mem,vcores的资源,如果显示配置mem,vcores等资源，则capacityConfigType是CapacityConfigType.ABSOLUTE_RESOURCE
+      // 否则是CapacityConfigType.PERCENT_RESOURCE
       updateConfigurableResourceRequirement(getQueuePath(), clusterResource);
-
+      // 每一个Container的最大分配量
       this.maximumAllocation =
           configuration.getMaximumAllocationPerQueue(
               getQueuePath());
 
       // initialized the queue state based on previous state, configured state
       // and its parent state.
+      // 设置队列的状态
       QueueState previous = getState();
       QueueState configuredState = configuration
           .getConfiguredState(getQueuePath());
@@ -418,7 +426,7 @@ public abstract class AbstractCSQueue implements CSQueue {
           configuration);
       this.intraQueuePreemptionDisabledInHierarchy =
           isIntraQueueHierarchyPreemptionDisabled(this, configuration);
-
+      // 队列的优先级
       this.priority = configuration.getQueuePriority(
           getQueuePath());
 
@@ -443,7 +451,7 @@ public abstract class AbstractCSQueue implements CSQueue {
         configuration.getAllUserWeightsForQueue(getQueuePath()));
     return unionInheritedWeights;
   }
-
+  // 可以显示配置mem,vcores的资源
   protected void updateConfigurableResourceRequirement(String queuePath,
       Resource clusterResource) {
     CapacitySchedulerConfiguration conf = csContext.getConfiguration();

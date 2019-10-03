@@ -57,9 +57,10 @@ public class FairSharePolicy extends SchedulingPolicy {
   }
 
   /**
+   *
    * Compare Schedulables mainly via fair share usage to meet fairness.
    * Specifically, it goes through following four steps.
-   *
+   * 比较需求。
    * 1. Compare demands. Schedulables without resource demand get lower priority
    * than ones who have demands.
    * 
@@ -87,6 +88,8 @@ public class FairSharePolicy extends SchedulingPolicy {
 
     @Override
     public int compare(Schedulable s1, Schedulable s2) {
+      // s1没有分配到资源,s2分配到资源 s1>s2
+      // s2没有分配到资源,s1分配到资源 s1<s2
       int res = compareDemand(s1, s2);
 
       // Pre-compute resource usages to avoid duplicate calculation
@@ -113,7 +116,8 @@ public class FairSharePolicy extends SchedulingPolicy {
 
       return res;
     }
-
+    // s1没有分配到资源,s2分配到资源 s1>s2
+    // s2没有分配到资源,s1分配到资源 s1<s2
     private int compareDemand(Schedulable s1, Schedulable s2) {
       int res = 0;
       Resource demand1 = s1.getDemand();

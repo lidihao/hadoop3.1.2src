@@ -33,6 +33,9 @@ public enum RMAppAttemptEventType {
   
   // Source: ApplicationMasterService
   REGISTERED,
+  // ApplicaitionMaster需周期性地调用RPC函数ApplicationMasterProtocol#allocate
+  // 向ResourceManager汇报自己的进度，申请资源和获取已经分配的资源，每次调用会触发一个
+  // STATUS_UPDATE事件,从而引发RMAppAttemptImpl保存它的最新执行进度
   STATUS_UPDATE,
   UNREGISTERED,
 

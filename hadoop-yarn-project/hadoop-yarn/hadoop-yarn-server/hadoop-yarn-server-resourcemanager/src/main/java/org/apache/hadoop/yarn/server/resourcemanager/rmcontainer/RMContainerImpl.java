@@ -74,6 +74,7 @@ public class RMContainerImpl implements RMContainer {
       RMContainerState.NEW)
 
     // Transitions from NEW state
+          // 分配到容器资源，触发RMContainerEventType.START事件
     .addTransition(RMContainerState.NEW, RMContainerState.ALLOCATED,
         RMContainerEventType.START, new ContainerStartedTransition())
     .addTransition(RMContainerState.NEW, RMContainerState.KILLED,
@@ -98,6 +99,8 @@ public class RMContainerImpl implements RMContainer {
        
 
     // Transitions from ALLOCATED state
+          // 向ContainerAllicationExpirer注册以启动监控，之后向RMAppAttemptImpl
+          //发送RMAppAttemptEventType.CONTAINER_ACQUIRED事件
     .addTransition(RMContainerState.ALLOCATED, RMContainerState.ACQUIRED,
         RMContainerEventType.ACQUIRED, new AcquiredTransition())
     .addTransition(RMContainerState.ALLOCATED, RMContainerState.EXPIRED,
@@ -706,7 +709,7 @@ public class RMContainerImpl implements RMContainer {
       // container.getContainer() can return null when a RMContainer is a
       // reserved container
       updateAttemptMetrics(container);
-
+      // RMAppAttemptEvent.CONTAINER_FINISHED
       container.eventHandler.handle(new RMAppAttemptContainerFinishedEvent(
         container.appAttemptId, finishedEvent.getRemoteContainerStatus(),
           container.getAllocatedNode()));
@@ -779,6 +782,7 @@ public class RMContainerImpl implements RMContainer {
           new AllocationExpirationInfo(container.getContainerId()));
 
       // Inform node
+      // 通知RMNode RMNodeEvent.CLEANUP_CONTAINER
       container.eventHandler.handle(new RMNodeCleanContainerEvent(
           container.nodeId, container.getContainerId()));
 

@@ -785,6 +785,7 @@ public class ParentQueue extends AbstractCSQueue {
     printChildQueues();
 
     // Try to assign to most 'under-served' sub-queue
+    // 将队列安队列优先级进行排序
     for (Iterator<CSQueue> iter = sortAndGetChildrenAllocationIterator(
         candidates.getPartition()); iter.hasNext(); ) {
       CSQueue childQueue = iter.next();
@@ -797,7 +798,7 @@ public class ParentQueue extends AbstractCSQueue {
       ResourceLimits childLimits =
           getResourceLimitsOfChild(childQueue, cluster, limits.getNetLimit(),
               candidates.getPartition());
-
+      // 调用子队列实施分配逻辑
       CSAssignment childAssignment = childQueue.assignContainers(cluster,
           candidates, childLimits, schedulingMode);
       if(LOG.isDebugEnabled()) {

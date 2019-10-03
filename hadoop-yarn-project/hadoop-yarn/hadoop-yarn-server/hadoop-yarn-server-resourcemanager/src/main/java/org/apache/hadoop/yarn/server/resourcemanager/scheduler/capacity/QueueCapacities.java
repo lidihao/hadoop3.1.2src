@@ -49,6 +49,12 @@ public class QueueCapacities {
   
   // Usage enum here to make implement cleaner
   private enum CapacityType {
+    // 1.已经使用的容量，占父队列的百分比
+    // 2.已经使用的容量，占集群总资源的百分比
+    // 3.最大的容量，占父队列的百分比
+    // 4.最大的容量，占集群总资源的百分比
+    // 5.最小容量，占父队列的百分比
+    // 6.最小容量，占集群总资源的百分比
     USED_CAP(0), ABS_USED_CAP(1), MAX_CAP(2), ABS_MAX_CAP(3), CAP(4), ABS_CAP(5),
       MAX_AM_PERC(6), RESERVED_CAP(7), ABS_RESERVED_CAP(8);
 

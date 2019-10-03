@@ -54,7 +54,7 @@ import org.apache.hadoop.yarn.server.resourcemanager.security.AppPriorityACLsMan
 import com.google.common.annotations.VisibleForTesting;
 
 /**
- *
+ *CapacityScheduler的队列上下文
  * Context of the Queues in Capacity Scheduler.
  *
  */
@@ -89,6 +89,7 @@ public class CapacitySchedulerQueueManager implements SchedulerQueueManager<
   }
 
   private static final QueueHook NOOP = new QueueHook();
+  // CapacitySchedulerContext,只读
   private CapacitySchedulerContext csContext;
   private final YarnAuthorizationProvider authorizer;
   private final Map<String, CSQueue> queues = new ConcurrentHashMap<>();
@@ -157,8 +158,11 @@ public class CapacitySchedulerQueueManager implements SchedulerQueueManager<
     throws IOException {
     root = parseQueue(this.csContext, conf, null,
         CapacitySchedulerConfiguration.ROOT, queues, queues, NOOP);
+    // 设置Queue的ACL
     setQueueAcls(authorizer, appPriorityACLManager, queues);
+    // 甚至Queue的Label
     labelManager.reinitializeQueueLabels(getQueueToLabels());
+    // 设置Queue的状态
     this.queueStateManager.initialize(this);
     LOG.info("Initialized root queue " + root);
   }
@@ -219,8 +223,11 @@ public class CapacitySchedulerQueueManager implements SchedulerQueueManager<
     String fullQueueName = (parent == null) ?
         queueName :
         (parent.getQueuePath() + "." + queueName);
+    // 通过yarn.scheduler.capacity.<队列命>.queues配置,子队列通过","分割,如 default,a,b
     String[] childQueueNames = conf.getQueues(fullQueueName);
+    // yarn.scheduler.capacity.<队列命>.reservable配置
     boolean isReservableQueue = conf.isReservable(fullQueueName);
+    // yarn.scheduler.capacity.<队列命>.auto-create-child-queue.enable,默认为false
     boolean isAutoCreateEnabled = conf.isAutoCreateChildQueueEnabled(
         fullQueueName);
     if (childQueueNames == null || childQueueNames.length == 0) {

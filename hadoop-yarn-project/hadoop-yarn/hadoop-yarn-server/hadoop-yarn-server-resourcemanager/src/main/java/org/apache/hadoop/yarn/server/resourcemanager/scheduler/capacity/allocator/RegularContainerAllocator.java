@@ -425,6 +425,7 @@ public class RegularContainerAllocator extends AbstractContainerAllocator {
     NodeType requestLocalityType = null;
 
     // Data-local
+    // 优先满足数据本地化
     PendingAsk nodeLocalAsk =
         application.getPendingAsk(schedulerKey, node.getNodeName());
     if (nodeLocalAsk.getCount() > 0) {
@@ -874,6 +875,7 @@ public class RegularContainerAllocator extends AbstractContainerAllocator {
 
     if (reservedContainer == null) {
       // Check if application needs more resource, skip if it doesn't need more.
+      // 应用是否需要更多的资源，因为有多个线程在调度schedule(cs)这个方法,可能其他一些线程已经分配完资源了
       if (!application.hasPendingResourceRequest(rc,
           candidates.getPartition(), clusterResource, schedulingMode)) {
         if (LOG.isDebugEnabled()) {
@@ -889,7 +891,7 @@ public class RegularContainerAllocator extends AbstractContainerAllocator {
       }
       
       // Schedule in priority order
-      // 根据
+      // 根据SchedulerRequestKey的优先级进行排队
       for (SchedulerRequestKey schedulerKey : application.getSchedulerKeys()) {
         // 分配资源
         ContainerAllocation result = allocate(clusterResource, candidates,
