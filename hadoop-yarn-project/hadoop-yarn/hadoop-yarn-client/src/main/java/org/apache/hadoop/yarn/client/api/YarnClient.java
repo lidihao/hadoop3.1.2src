@@ -95,6 +95,7 @@ public abstract class YarnClient extends AbstractService {
   }
 
   /**
+   * 包含ApplicationSubmissionContext和GetNewApplicationResponse
    * <p>
    * Obtain a {@link YarnClientApplication} for a new application,
    * which in turn contains the {@link ApplicationSubmissionContext} and

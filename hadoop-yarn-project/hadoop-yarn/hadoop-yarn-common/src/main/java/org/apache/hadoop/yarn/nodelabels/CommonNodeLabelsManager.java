@@ -61,7 +61,7 @@ import org.apache.hadoop.yarn.util.resource.Resources;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
-
+// 主要维护nodeId和Label的关系
 @Private
 public class CommonNodeLabelsManager extends AbstractService {
   protected static final Log LOG = LogFactory.getLog(CommonNodeLabelsManager.class);
@@ -87,15 +87,17 @@ public class CommonNodeLabelsManager extends AbstractService {
           + YarnConfiguration.NODE_LABELS_ENABLED;
 
   /**
+   * 如果label为空,则属于DEFAULT_LABEL
    * If a user doesn't specify label of a queue or node, it belongs
    * DEFAULT_LABEL
    */
   public static final String NO_LABEL = "";
-
+  //中央调度,通过它来和其他组件进行沟通
   protected Dispatcher dispatcher;
-
+  // label名字到RMNodeLabel的映射
   protected ConcurrentMap<String, RMNodeLabel> labelCollections =
       new ConcurrentHashMap<String, RMNodeLabel>();
+  // host名字 到Node对象的映射
   protected ConcurrentMap<String, Host> nodeCollections =
       new ConcurrentHashMap<String, Host>();
 
@@ -103,7 +105,7 @@ public class CommonNodeLabelsManager extends AbstractService {
 
   protected final ReadLock readLock;
   protected final WriteLock writeLock;
-
+  // 用来保存Label的元数据
   protected NodeLabelsStore store;
   private boolean nodeLabelsEnabled = false;
 
@@ -176,6 +178,7 @@ public class CommonNodeLabelsManager extends AbstractService {
   }
   
   // Dispatcher related code
+  // 处理NodeLabelsEvent事件
   protected void handleStoreEvent(NodeLabelsStoreEvent event) {
     try {
       switch (event.getType()) {
@@ -222,6 +225,7 @@ public class CommonNodeLabelsManager extends AbstractService {
   @Override
   protected void serviceInit(Configuration conf) throws Exception {
     // set if node labels enabled
+    // 是否开启 NodeLabel功能
     nodeLabelsEnabled = YarnConfiguration.areNodeLabelsEnabled(conf);
 
     isCentralizedNodeLabelConfiguration  =
@@ -241,7 +245,7 @@ public class CommonNodeLabelsManager extends AbstractService {
   boolean isCentralizedConfiguration() {
     return isCentralizedNodeLabelConfiguration;
   }
-
+  // 初始化NodeLabelStore
   protected void initNodeLabelStore(Configuration conf) throws Exception {
     this.store =
         ReflectionUtils
@@ -255,6 +259,7 @@ public class CommonNodeLabelsManager extends AbstractService {
   }
 
   // for UT purpose
+  //启动Dispatcher
   protected void startDispatcher() {
     // start dispatcher
     AsyncDispatcher asyncDispatcher = (AsyncDispatcher) dispatcher;
@@ -265,6 +270,7 @@ public class CommonNodeLabelsManager extends AbstractService {
   protected void serviceStart() throws Exception {
     if (nodeLabelsEnabled) {
       setInitNodeLabelStoreInProgress(true);
+      // 初始化NodeLabelStore
       initNodeLabelStore(getConfig());
       setInitNodeLabelStoreInProgress(false);
     }
@@ -311,6 +317,7 @@ public class CommonNodeLabelsManager extends AbstractService {
       return;
     }
     List<NodeLabel> newLabels = new ArrayList<NodeLabel>();
+    // 合法性检查
     normalizeNodeLabels(labels);
     // check any mismatch in exclusivity no mismatch with skip
     checkExclusivityMatch(labels);

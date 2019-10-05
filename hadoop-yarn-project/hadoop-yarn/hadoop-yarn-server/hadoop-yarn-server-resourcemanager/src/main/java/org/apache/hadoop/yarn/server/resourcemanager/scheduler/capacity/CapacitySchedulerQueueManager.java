@@ -56,7 +56,7 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  *CapacityScheduler的队列上下文
  * Context of the Queues in Capacity Scheduler.
- *
+ *负责创建和管理CSQueue队列
  */
 @Private
 @Unstable
@@ -160,7 +160,7 @@ public class CapacitySchedulerQueueManager implements SchedulerQueueManager<
         CapacitySchedulerConfiguration.ROOT, queues, queues, NOOP);
     // 设置Queue的ACL
     setQueueAcls(authorizer, appPriorityACLManager, queues);
-    // 甚至Queue的Label
+    // 设置Queue的Label
     labelManager.reinitializeQueueLabels(getQueueToLabels());
     // 设置Queue的状态
     this.queueStateManager.initialize(this);

@@ -953,6 +953,7 @@ public class ContainerManagerImpl extends CompositeService implements
           }
           performContainerPreStartChecks(nmTokenIdentifier, request,
               containerTokenIdentifier);
+          // 启动容器
           startContainerInternal(containerTokenIdentifier, request);
           succeededContainers.add(containerId);
         } catch (YarnException e) {

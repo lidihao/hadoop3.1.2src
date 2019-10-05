@@ -26,9 +26,11 @@ import org.apache.hadoop.yarn.api.records.NodeId;
 import org.apache.hadoop.yarn.api.records.NodeLabel;
 import org.apache.hadoop.yarn.api.records.Resource;
 import org.apache.hadoop.yarn.util.resource.Resources;
-
+// Label -> NodeId
 public class RMNodeLabel implements Comparable<RMNodeLabel> {
+  // 这个Label的资源
   private Resource resource;
+  // label活跃的Node
   private int numActiveNMs;
   private String labelName;
   private Set<NodeId> nodeIds;

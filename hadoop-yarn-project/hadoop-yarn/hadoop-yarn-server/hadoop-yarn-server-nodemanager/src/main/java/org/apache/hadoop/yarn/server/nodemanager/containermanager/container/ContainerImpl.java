@@ -311,6 +311,7 @@ public class ContainerImpl implements Container {
         stateMachineFactory =
       new StateMachineFactory<ContainerImpl, ContainerState, ContainerEventType, ContainerEvent>(ContainerState.NEW)
     // From NEW State
+              // 向ResourceLocalizationService发送资源本地化请求
     .addTransition(ContainerState.NEW,
         EnumSet.of(ContainerState.LOCALIZING,
             ContainerState.SCHEDULED,
@@ -1194,6 +1195,7 @@ public class ContainerImpl implements Container {
       container.containerLocalizationStartTime = clock.getTime();
 
       // Send requests for public, private resources
+      // 向ResourceLocalizationService发送资源本地化请求
       Map<String,LocalResource> cntrRsrc = ctxt.getLocalResources();
       if (!cntrRsrc.isEmpty()) {
         try {

@@ -496,6 +496,7 @@ public class ResourceLocalizationService extends CompositeService
   }
   
   /**
+   * 把需的每个资源单独封装成一个REQUEST事件，发送给对应的资源状态追踪器LocalResourceTrackerImpl
    * For each of the requested resources for a container, determines the
    * appropriate {@link LocalResourcesTracker} and forwards a 
    * {@link LocalResourceRequest} to that tracker.
@@ -795,8 +796,10 @@ public class ResourceLocalizationService extends CompositeService
           (LocalizerResourceRequestEvent)event;
         switch (req.getVisibility()) {
         case PUBLIC:
+          // 如果是PUBLIC资源，则统一交到PUBLIC线程统一处理
           publicLocalizer.addResource(req);
           break;
+          // 为该Container创建一个LocalizerRunner线程
         case PRIVATE:
         case APPLICATION:
           synchronized (privLocalizers) {
@@ -1259,6 +1262,7 @@ public class ResourceLocalizationService extends CompositeService
         writeCredentials(nmPrivateCTokensPath);
         // 2) exec initApplication and wait
         //启动ContainerLocalizer进程取下载资源，？？为什么重新搞一个进程??
+        // ContainerLocalizer通过LocalizationProtocol与ResourceLocalizationService沟通
         if (dirsHandler.areDisksHealthy()) {
           exec.startLocalizer(new LocalizerStartContext.Builder()
               .setNmPrivateContainerTokens(nmPrivateCTokensPath)

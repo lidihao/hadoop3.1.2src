@@ -226,7 +226,8 @@ public class RMNodeLabelsManager extends CommonNodeLabelsManager {
   }
 
   /*
-   * Following methods are used for setting if a node is up and running, and it
+   *当添加该NodeManager,为该nodeId创建Host对象和Node对象
+   *  Following methods are used for setting if a node is up and running, and it
    * will update running nodes resource
    */
   public void activateNode(NodeId nodeId, Resource resource) {
@@ -270,6 +271,7 @@ public class RMNodeLabelsManager extends CommonNodeLabelsManager {
   }
   
   /*
+   *删除该node
    * Following methods are used for setting if a node unregistered to RM
    */
   public void deactivateNode(NodeId nodeId) {
@@ -312,7 +314,7 @@ public class RMNodeLabelsManager extends CommonNodeLabelsManager {
     deactivateNode(node);
     activateNode(node, newResource);
   }
-
+  // 建立Queue与Label的关系
   public void reinitializeQueueLabels(Map<String, Set<String>> queueToLabels) {
     try {
       writeLock.lock();
@@ -426,7 +428,7 @@ public class RMNodeLabelsManager extends CommonNodeLabelsManager {
     }
     return map;
   }
-
+  //更新Label的使用内存,和队列的可使用内存
   @SuppressWarnings("unchecked")
   private void updateResourceMappings(Map<String, Host> before,
       Map<String, Host> after) {

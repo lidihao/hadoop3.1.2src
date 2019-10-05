@@ -21,6 +21,7 @@ package org.apache.hadoop.yarn.server.nodemanager.containermanager.application;
 public enum ApplicationEventType {
 
   // Source: ContainerManager
+  // 启动AM Container触发
   INIT_APPLICATION,
   INIT_CONTAINER,
   FINISH_APPLICATION, // Source: LogAggregationService if init fails

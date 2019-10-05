@@ -1880,6 +1880,7 @@ public class CapacityScheduler extends
       nodeTracker.addNode(schedulerNode);
 
       // update this node to node label manager
+      // 更新该Node的Resource
       if (labelManager != null) {
         labelManager.activateNode(nodeManager.getNodeID(),
             schedulerNode.getTotalResource());

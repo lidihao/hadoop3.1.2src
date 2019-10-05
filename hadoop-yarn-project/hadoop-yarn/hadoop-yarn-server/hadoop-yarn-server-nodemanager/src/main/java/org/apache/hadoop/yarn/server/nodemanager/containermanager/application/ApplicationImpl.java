@@ -221,6 +221,7 @@ public class ApplicationImpl implements Application {
           ApplicationEventType, ApplicationEvent>(ApplicationState.NEW)
 
            // Transitions from NEW state
+           // 设置ACL,并向LogHandler发送一个LogHandlerEventType.APPLICATION_STARTED事件,之后由NEW->INITING状态
            .addTransition(ApplicationState.NEW, ApplicationState.INITING,
                ApplicationEventType.INIT_APPLICATION, new AppInitTransition())
            .addTransition(ApplicationState.NEW, ApplicationState.NEW,
@@ -239,12 +240,14 @@ public class ApplicationImpl implements Application {
            .addTransition(ApplicationState.INITING, ApplicationState.INITING,
                ApplicationEventType.APPLICATION_CONTAINER_FINISHED,
                CONTAINER_DONE_TRANSITION)
+              // 向ResourceLocalizationService发送LocalizationEventType.INIT_APPLICATION_RESOURCES
            .addTransition(ApplicationState.INITING, ApplicationState.INITING,
                ApplicationEventType.APPLICATION_LOG_HANDLING_INITED,
                new AppLogInitDoneTransition())
            .addTransition(ApplicationState.INITING, ApplicationState.INITING,
                ApplicationEventType.APPLICATION_LOG_HANDLING_FAILED,
                new AppLogInitFailTransition())
+              // 给每个container发送一个ContainerEventType.INIT_CONTAINER
            .addTransition(ApplicationState.INITING, ApplicationState.RUNNING,
                ApplicationEventType.APPLICATION_INITED,
                new AppInitDoneTransition())
@@ -327,6 +330,7 @@ public class ApplicationImpl implements Application {
   private final StateMachine<ApplicationState, ApplicationEventType, ApplicationEvent> stateMachine;
 
   /**
+   * 设置ACL,并向LogHandler发送一个LogHandlerEventType.APPLICATION_STARTED事件,之后由NEW->INITING状态
    * Notify services of new application.
    * 
    * In particular, this initializes the {@link LogAggregationService}
@@ -361,6 +365,7 @@ public class ApplicationImpl implements Application {
       SingleArcTransition<ApplicationImpl, ApplicationEvent> {
     @Override
     public void transition(ApplicationImpl app, ApplicationEvent event) {
+      // 向ResourceLocalizationService发送LocalizationEventType.INIT_APPLICATION_RESOURCES
       app.dispatcher.getEventHandler().handle(
           new ApplicationLocalizationEvent(
               LocalizationEventType.INIT_APPLICATION_RESOURCES, app));
@@ -459,6 +464,7 @@ public class ApplicationImpl implements Application {
       ApplicationContainerInitEvent initEvent =
         (ApplicationContainerInitEvent) event;
       Container container = initEvent.getContainer();
+      // 加入containers
       app.containers.put(container.getContainerId(), container);
       LOG.info("Adding " + container.getContainerId()
           + " to application " + app.toString());
@@ -484,7 +490,7 @@ public class ApplicationImpl implements Application {
       }
     }
   }
-
+  // 给每个container发送一个ContainerEventType.INIT_CONTAINER
   @SuppressWarnings("unchecked")
   static class AppInitDoneTransition implements
       SingleArcTransition<ApplicationImpl, ApplicationEvent> {

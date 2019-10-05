@@ -194,6 +194,7 @@ public class YarnConfiguration extends Configuration {
   public static final long DEFAULT_RM_EPOCH = 0L;
 
   /** The address of the applications manager interface in the RM.*/
+  // ApplicationClientProtocol的地址, Client与RM通信的地址
   public static final String RM_ADDRESS = 
     RM_PREFIX + "address";
   public static final int DEFAULT_RM_PORT = 8032;
@@ -231,6 +232,7 @@ public class YarnConfiguration extends Configuration {
     RM_PREFIX + "principal";
   
   /** The address of the scheduler interface.*/
+  // ApplicationMasterProtocol的地址,ApplicationMaster与RM沟通的地址
   public static final String RM_SCHEDULER_ADDRESS = 
     RM_PREFIX + "scheduler.address";
   public static final int DEFAULT_RM_SCHEDULER_PORT = 8030;

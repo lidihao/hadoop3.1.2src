@@ -76,6 +76,7 @@ public class LocalizedResource implements EventHandler<ResourceEvent> {
           ResourceEventType,ResourceEvent>(ResourceState.INIT)
 
     // From INIT (ref == 0, awaiting req)
+                // 触发LocalizerEvent.REQUEST_RESOURCE_LOCALIZATION
     .addTransition(ResourceState.INIT, ResourceState.DOWNLOADING,
         ResourceEventType.REQUEST, new FetchResourceTransition())
     .addTransition(ResourceState.INIT, ResourceState.LOCALIZED,

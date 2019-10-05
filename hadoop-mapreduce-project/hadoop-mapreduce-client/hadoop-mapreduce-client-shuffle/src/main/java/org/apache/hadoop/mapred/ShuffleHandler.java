@@ -143,7 +143,7 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.cache.Weigher;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.protobuf.ByteString;
-
+// Shuffle插件
 public class ShuffleHandler extends AuxiliaryService {
 
   private static final org.slf4j.Logger LOG =
@@ -835,7 +835,7 @@ public class ShuffleHandler extends AuxiliaryService {
     }
 
   }
-
+  // 用netty搭建的一个http server,   reducer获取map输出的数据
   class Shuffle extends SimpleChannelUpstreamHandler {
     private static final int MAX_WEIGHT = 10 * 1024 * 1024;
     private static final int EXPIRE_AFTER_ACCESS_MINUTES = 5;
@@ -1005,7 +1005,7 @@ public class ShuffleHandler extends AuxiliaryService {
         sendError(ctx, e.getMessage(), UNAUTHORIZED);
         return;
       }
-
+      //
       Map<String, MapOutputInfo> mapOutputInfoMap =
           new HashMap<String, MapOutputInfo>();
       Channel ch = evt.getChannel();
