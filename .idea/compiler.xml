@@ -38,6 +38,7 @@
         <module name="hadoop-yarn-server-common" />
         <module name="hadoop-kafka" />
         <module name="hadoop-yarn-server-router" />
+        <module name="hadoop-annotations" />
         <module name="hadoop-mapreduce-client-uploader" />
         <module name="hadoop-rumen" />
         <module name="hadoop-yarn-client" />
@@ -47,12 +48,11 @@
         <module name="hadoop-streaming" />
         <module name="hadoop-yarn-server-applicationhistoryservice" />
         <module name="hadoop-fs2img" />
-        <module name="hadoop-annotations" />
+        <module name="hadoop-minicluster" />
         <module name="hadoop-yarn-applications-distributedshell" />
         <module name="hadoop-cloud-storage" />
         <module name="hadoop-hdfs-native-client" />
         <module name="hadoop-azure-datalake" />
-        <module name="hadoop-minicluster" />
         <module name="hadoop-datajoin" />
         <module name="hadoop-build-tools" />
         <module name="hadoop-gridmix" />

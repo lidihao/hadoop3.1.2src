@@ -54,6 +54,7 @@ import org.apache.hadoop.yarn.exceptions.YarnException;
 
 /**
  * <p>
+ *    实现client与Resource的交互
  * The protocol between clients and the <code>ResourceManager</code> or
  * <code>ApplicationHistoryServer</code> to get information on applications,
  * application attempts and containers.
